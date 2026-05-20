@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
@@ -16,10 +17,11 @@ public class GameMaster {
 
     public static void main(String[] args) {
         Board board = createBoard();
+        int levelScore = 0;
 
         Scanner sc = new Scanner(System.in);
         while (true) {
-            System.out.println(board);
+            printGameScreen(System.out, board, levelScore);
 
             if (board.isSolved()) {
                 break;
@@ -35,10 +37,22 @@ public class GameMaster {
                 continue;
             }
 
-            board.tryMovePlayer(direction);
+            levelScore = updateLevelScore(levelScore, board.tryMovePlayer(direction));
         }
 
         sc.close();
+    }
+
+    static void printGameScreen(PrintStream out, Board board, int levelScore) {
+        out.print(board);
+        out.println("Level score: " + levelScore);
+    }
+
+    static int updateLevelScore(int levelScore, boolean moved) {
+        if (moved) {
+            return levelScore + 1;
+        }
+        return levelScore;
     }
 
     private static Pair directionFromInput(char character) {

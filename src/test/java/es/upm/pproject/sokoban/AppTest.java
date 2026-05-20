@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import org.junit.jupiter.api.Test;
 
 import es.upm.pproject.sokoban.GameObjects.Box;
@@ -31,6 +34,29 @@ public class AppTest {
         assertEquals("W", new Player().toString());
         assertEquals("#", new Box().toString());
         assertEquals("*", new GoalPosition().toString());
+    }
+
+    @Test
+    public void gameScreenShowsCurrentLevelScore() {
+        Board board = new Board(1, 1);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        GameMaster.printGameScreen(new PrintStream(output), board, 3);
+
+        assertTrue(output.toString().contains("Level score: 3"));
+    }
+
+    @Test
+    public void levelScoreIncreasesOnlyAfterSuccessfulMoves() {
+        Board board = new Board(1, 2);
+        board.addActor(new Pair(0, 0), new Player());
+        int levelScore = 0;
+
+        levelScore = GameMaster.updateLevelScore(levelScore, board.tryMovePlayer(new Pair(1, 0)));
+        assertEquals(1, levelScore);
+
+        levelScore = GameMaster.updateLevelScore(levelScore, board.tryMovePlayer(new Pair(1, 0)));
+        assertEquals(1, levelScore);
     }
 
     @Test
