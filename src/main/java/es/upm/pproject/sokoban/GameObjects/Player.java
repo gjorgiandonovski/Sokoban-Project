@@ -16,7 +16,7 @@ public class Player implements IObject {
 
     @Override
     public String toString() {
-        return onGoalPos ? "+" : "@";
+        return "W";
     }
 
     @Override

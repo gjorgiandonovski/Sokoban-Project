@@ -10,7 +10,7 @@ public class Wall implements IObject {
 
     @Override
     public String toString() {
-        return "#";
+        return "+";
     }
 
     @Override

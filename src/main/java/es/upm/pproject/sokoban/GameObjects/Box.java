@@ -16,7 +16,7 @@ public class Box implements IObject {
 
     @Override
     public String toString() {
-        return onGoalPos ? "*" : "$";
+        return "#";
     }
 
     @Override

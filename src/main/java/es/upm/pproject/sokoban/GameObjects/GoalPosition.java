@@ -10,7 +10,7 @@ public class GoalPosition implements IObject {
 
     @Override
     public String toString() {
-        return ".";
+        return "*";
     }
 
     @Override

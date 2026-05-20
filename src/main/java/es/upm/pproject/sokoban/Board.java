@@ -9,15 +9,26 @@ import es.upm.pproject.sokoban.GameObjects.Interfaces.IObject;
 public class Board {
     private final Map<Pair, IObject> terrain;
     private final Map<Pair, IObject> actors;
+    private final int rows;
+    private final int columns;
     private Pair playerPosition;
 
     public Board() {
+        this(0, 0);
+    }
+
+    public Board(int rows, int columns) {
+        if (rows < 0 || columns < 0) {
+            throw new IllegalArgumentException("Board dimensions cannot be negative");
+        }
         this.terrain = new HashMap<>();
         this.actors = new HashMap<>();
+        this.rows = rows;
+        this.columns = columns;
     }
 
     public Board(HashMap<Pair, IObject> objects) {
-        this();
+        this(inferRows(objects), inferColumns(objects));
         if (objects == null) return;
 
         for (Map.Entry<Pair, IObject> entry : objects.entrySet()) {
@@ -42,9 +53,18 @@ public class Board {
 
     public IObject get(int x, int y) {
         Pair p = new Pair(x, y);
+        if (!isInside(p)) return null;
         IObject actor = actors.get(p);
         if (actor != null) return actor;
         return terrain.get(p);
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getColumns() {
+        return columns;
     }
 
     public Pair findPlayer() {
@@ -53,6 +73,7 @@ public class Board {
 
     public void addTerrain(Pair position, IObject obj) {
         if (obj == null) return;
+        requireInside(position);
         if (obj.type() != Type.WALL && obj.type() != Type.GOALPOSITION) {
             throw new IllegalArgumentException("Terrain must be WALL or GOALPOSITION");
         }
@@ -61,23 +82,34 @@ public class Board {
 
     public void addActor(Pair position, IObject obj) {
         if (obj == null) return;
+        requireInside(position);
         if (obj.type() != Type.PLAYER && obj.type() != Type.BOX) {
             throw new IllegalArgumentException("Actor must be PLAYER or BOX");
         }
+        if (isWall(position)) {
+            throw new IllegalArgumentException("Actors cannot be placed on walls");
+        }
+        if (actors.containsKey(position)) {
+            throw new IllegalArgumentException("Only one actor can occupy a square");
+        }
         if (obj.type() == Type.PLAYER) {
+            if (playerPosition != null) {
+                throw new IllegalArgumentException("The board can only have one player");
+            }
             playerPosition = position;
         }
         actors.put(position, obj);
+        updateActorGoalFlag(position);
     }
 
     public boolean tryMovePlayer(Pair direction) {
         if (playerPosition == null) return false;
-        if (direction == null) return false;
-        if (direction.x() == 0 && direction.y() == 0) return false;
+        if (!isCardinalDirection(direction)) return false;
 
         Pair from = playerPosition;
         Pair to = from.add(direction);
 
+        if (!isInside(to)) return false;
         if (isWall(to)) return false;
 
         IObject occupant = actors.get(to);
@@ -92,6 +124,7 @@ public class Board {
         if (occupant.type() != Type.BOX) return false;
 
         Pair boxTo = to.add(direction);
+        if (!isInside(boxTo)) return false;
         if (isWall(boxTo)) return false;
         if (actors.containsKey(boxTo)) return false;
 
@@ -108,22 +141,27 @@ public class Board {
     }
 
     public boolean isSolved() {
-        boolean hasGoal = false;
-        for (IObject tile : terrain.values()) {
-            if (tile.type() == Type.GOALPOSITION) {
-                hasGoal = true;
-                break;
+        int goalCount = 0;
+        int boxCount = 0;
+
+        for (Map.Entry<Pair, IObject> entry : terrain.entrySet()) {
+            if (entry.getValue().type() == Type.GOALPOSITION) {
+                goalCount++;
+                IObject actor = actors.get(entry.getKey());
+                if (actor == null || actor.type() != Type.BOX) {
+                    return false;
+                }
             }
         }
-        if (!hasGoal) return false;
 
         for (Map.Entry<Pair, IObject> entry : actors.entrySet()) {
             IObject actor = entry.getValue();
             if (actor.type() != Type.BOX) continue;
+            boxCount++;
             if (!isGoal(entry.getKey())) return false;
         }
 
-        return true;
+        return goalCount > 0 && goalCount == boxCount;
     }
 
     private void moveActor(Pair from, Pair to) {
@@ -154,29 +192,49 @@ public class Board {
         }
     }
 
+    private boolean isInside(Pair position) {
+        if (position == null) return false;
+        return position.x() >= 0 && position.x() < columns
+            && position.y() >= 0 && position.y() < rows;
+    }
+
+    private void requireInside(Pair position) {
+        if (!isInside(position)) {
+            throw new IllegalArgumentException("Position is outside the board");
+        }
+    }
+
+    private boolean isCardinalDirection(Pair direction) {
+        if (direction == null) return false;
+        int distance = Math.abs(direction.x()) + Math.abs(direction.y());
+        return distance == 1;
+    }
+
+    private static int inferRows(HashMap<Pair, IObject> objects) {
+        if (objects == null || objects.isEmpty()) return 0;
+        int maxY = 0;
+        for (Pair p : objects.keySet()) {
+            maxY = Math.max(maxY, p.y());
+        }
+        return maxY + 1;
+    }
+
+    private static int inferColumns(HashMap<Pair, IObject> objects) {
+        if (objects == null || objects.isEmpty()) return 0;
+        int maxX = 0;
+        for (Pair p : objects.keySet()) {
+            maxX = Math.max(maxX, p.x());
+        }
+        return maxX + 1;
+    }
+
     @Override
     public String toString() {
-        if (terrain.isEmpty() && actors.isEmpty()) return "";
-
-        int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
-        int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
-
-        for (Pair p : terrain.keySet()) {
-            minX = Math.min(minX, p.x());
-            maxX = Math.max(maxX, p.x());
-            minY = Math.min(minY, p.y());
-            maxY = Math.max(maxY, p.y());
-        }
-        for (Pair p : actors.keySet()) {
-            minX = Math.min(minX, p.x());
-            maxX = Math.max(maxX, p.x());
-            minY = Math.min(minY, p.y());
-            maxY = Math.max(maxY, p.y());
-        }
+        if (rows == 0 || columns == 0) return "";
 
         StringBuilder sb = new StringBuilder();
-        for (int y = minY; y <= maxY; y++) {
-            for (int x = minX; x <= maxX; x++) {
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < columns; x++) {
                 Pair p = new Pair(x, y);
                 IObject actor = actors.get(p);
                 if (actor != null) {
