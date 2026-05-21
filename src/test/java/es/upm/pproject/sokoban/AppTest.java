@@ -60,6 +60,24 @@ public class AppTest {
     }
 
     @Test
+    public void restartShortcutReloadsCurrentLevelAndResetsScore() {
+        Board board = GameMaster.loadLevel(1);
+        String initialBoard = board.toString();
+        int levelScore = GameMaster.updateLevelScore(0, board.tryMovePlayer(new Pair(1, 0)));
+
+        assertTrue(GameMaster.isRestartInput('r'));
+        assertTrue(GameMaster.isRestartInput('R'));
+        assertEquals(1, levelScore);
+
+        Board restartedBoard = GameMaster.restartLevel(1);
+        levelScore = GameMaster.restartLevelScore();
+
+        assertEquals(0, levelScore);
+        assertEquals(new Pair(3, 4), restartedBoard.findPlayer());
+        assertEquals(initialBoard, restartedBoard.toString());
+    }
+
+    @Test
     public void playerMovesHorizontallyAndVertically() {
         Board board = new Board(3, 3);
         board.addActor(new Pair(1, 1), new Player());

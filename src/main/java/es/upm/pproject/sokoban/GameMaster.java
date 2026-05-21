@@ -4,10 +4,13 @@ import java.io.PrintStream;
 import java.util.Scanner;
 
 public class GameMaster {
+    private static final int INITIAL_LEVEL = 1;
+    private static final int INITIAL_SCORE = 0;
 
     public static void main(String[] args) {
-        Board board = createBoard();
-        int levelScore = 0;
+        int levelNumber = INITIAL_LEVEL;
+        Board board = loadLevel(levelNumber);
+        int levelScore = INITIAL_SCORE;
 
         Scanner sc = new Scanner(System.in);
         while (true) {
@@ -21,7 +24,14 @@ public class GameMaster {
             if (input == null || input.isEmpty()) continue;
             if (input.length() != 1) continue;
 
-            Pair direction = directionFromInput(input.charAt(0));
+            char command = input.charAt(0);
+            if (isRestartInput(command)) {
+                board = restartLevel(levelNumber);
+                levelScore = restartLevelScore();
+                continue;
+            }
+
+            Pair direction = directionFromInput(command);
             if (direction == null) {
                 System.out.println("Please enter a valid input");
                 continue;
@@ -45,6 +55,18 @@ public class GameMaster {
         return levelScore;
     }
 
+    static Board restartLevel(int levelNumber) {
+        return loadLevel(levelNumber);
+    }
+
+    static int restartLevelScore() {
+        return INITIAL_SCORE;
+    }
+
+    static boolean isRestartInput(char character) {
+        return character == 'r' || character == 'R';
+    }
+
     private static Pair directionFromInput(char character) {
         switch (character) {
             case 'd':
@@ -61,7 +83,7 @@ public class GameMaster {
     }
 
     static Board createBoard() {
-        return loadLevel(1);
+        return loadLevel(INITIAL_LEVEL);
     }
 
     static Board loadLevel(int levelNumber) {
