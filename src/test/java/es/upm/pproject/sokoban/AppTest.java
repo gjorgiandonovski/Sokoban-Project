@@ -23,9 +23,9 @@ public class AppTest {
         Board board = GameMaster.createBoard();
 
         assertNotNull(board);
-        assertEquals(8, board.getRows());
+        assertEquals(9, board.getRows());
         assertEquals(10, board.getColumns());
-        assertEquals(new Pair(3, 4), board.findPlayer());
+        assertEquals(new Pair(2, 5), board.findPlayer());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class AppTest {
         levelScore = GameMaster.restartLevelScore();
 
         assertEquals(0, levelScore);
-        assertEquals(new Pair(3, 4), restartedBoard.findPlayer());
+        assertEquals(new Pair(2, 5), restartedBoard.findPlayer());
         assertEquals(initialBoard, restartedBoard.toString());
     }
 
