@@ -7,12 +7,18 @@ public class GameMaster {
     private static final int INITIAL_LEVEL = 1;
     private static final int INITIAL_SCORE = 0;
 
+    private static final String CLEAR_SCREEN = "\033[2J\033[H";
+    private static final String HIDE_CURSOR = "\033[?25l";
+    private static final String SHOW_CURSOR = "\033[?25h";
+
     public static void main(String[] args) {
         int levelNumber = INITIAL_LEVEL;
         Board board = loadLevel(levelNumber);
         int levelScore = INITIAL_SCORE;
 
         Scanner sc = new Scanner(System.in);
+
+        hideCursor(System.out);
         while (true) {
             printGameScreen(System.out, board, levelScore);
 
@@ -59,12 +65,22 @@ public class GameMaster {
             levelScore = updateLevelScore(levelScore, board.tryMovePlayer(direction));
         }
 
+        showCursor(System.out);
         sc.close();
     }
 
     static void printGameScreen(PrintStream out, Board board, int levelScore) {
+        out.print(CLEAR_SCREEN);
         out.print(board);
         out.println("Level score: " + levelScore);
+    }
+
+    static void hideCursor(PrintStream out){
+        out.print(HIDE_CURSOR);
+    }
+
+    static void showCursor(PrintStream out){
+        out.print(SHOW_CURSOR);
     }
 
     static int updateLevelScore(int levelScore, boolean moved) {
