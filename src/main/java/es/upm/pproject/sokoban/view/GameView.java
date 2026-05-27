@@ -22,6 +22,7 @@ public class GameView {
         out.print(renderedBoard);
         out.println("Level: " + controller.getLevelNumber());
         out.println("Level score: " + controller.getLevelScore());
+        out.println("Global score: " + controller.getGlobalScore());
     }
 
     public void displayMessage(String message) {

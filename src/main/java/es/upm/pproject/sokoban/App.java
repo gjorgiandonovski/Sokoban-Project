@@ -22,6 +22,7 @@ public class App {
                         continue;
                     } else {
                         view.displayMessage("No more levels available! You win the game!");
+                        view.displayMessage("Global score: " + controller.getGlobalScore());
                         break;
                     }
                 }

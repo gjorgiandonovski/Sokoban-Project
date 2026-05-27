@@ -17,6 +17,8 @@ public class GameController {
     private Board board;
     private int levelNumber;
     private int levelScore;
+    private int globalScore;
+    private boolean currentLevelScoreRecorded;
 
     public GameController() {
         this.boardService = ServiceFactory.createBoardService();
@@ -24,6 +26,8 @@ public class GameController {
         this.levelParserService = ServiceFactory.createLevelParserService();
         this.levelNumber = INITIAL_LEVEL;
         this.levelScore = INITIAL_SCORE;
+        this.globalScore = INITIAL_SCORE;
+        this.currentLevelScoreRecorded = false;
         this.board = loadLevel(levelNumber);
     }
 
@@ -31,6 +35,7 @@ public class GameController {
         if (direction != null) {
             boolean moved = boardService.tryMovePlayer(board, direction);
             if (moved) {
+                clearCurrentLevelScoreRecord();
                 levelScore++;
             }
         }
@@ -38,20 +43,26 @@ public class GameController {
 
     public void undoMove() {
         if (boardService.undo(board)) {
+            clearCurrentLevelScoreRecord();
             levelScore = Math.max(INITIAL_SCORE, levelScore - 1);
         }
     }
 
     public void restartLevel() {
+        clearCurrentLevelScoreRecord();
         this.board = loadLevel(levelNumber);
         this.levelScore = INITIAL_SCORE;
     }
 
     public boolean nextLevel() {
-        levelNumber++;
+        recordCurrentLevelScoreIfSolved();
+        int nextLevelNumber = levelNumber + 1;
         try {
-            this.board = loadLevel(levelNumber);
+            Board nextBoard = loadLevel(nextLevelNumber);
+            this.levelNumber = nextLevelNumber;
+            this.board = nextBoard;
             this.levelScore = INITIAL_SCORE;
+            this.currentLevelScoreRecorded = false;
             return true;
         } catch (Exception e) {
             return false;
@@ -64,6 +75,13 @@ public class GameController {
 
     public int getLevelScore() {
         return levelScore;
+    }
+
+    public int getGlobalScore() {
+        if (!currentLevelScoreRecorded && isSolved()) {
+            return globalScore + levelScore;
+        }
+        return globalScore;
     }
 
     public int getLevelNumber() {
@@ -119,5 +137,19 @@ public class GameController {
 
     public boolean isUndoInput(char character) {
         return character == 'u' || character == 'U';
+    }
+
+    private void recordCurrentLevelScoreIfSolved() {
+        if (!currentLevelScoreRecorded && isSolved()) {
+            globalScore += levelScore;
+            currentLevelScoreRecorded = true;
+        }
+    }
+
+    private void clearCurrentLevelScoreRecord() {
+        if (currentLevelScoreRecorded) {
+            globalScore = Math.max(INITIAL_SCORE, globalScore - levelScore);
+            currentLevelScoreRecorded = false;
+        }
     }
 }

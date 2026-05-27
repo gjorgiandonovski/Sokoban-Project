@@ -53,6 +53,7 @@ public class AppTest {
         view.render();
 
         assertTrue(output.toString().contains("Level score: 0"));
+        assertTrue(output.toString().contains("Global score: 0"));
     }
 
     @Test
@@ -64,6 +65,48 @@ public class AppTest {
 
         controller.movePlayer(new Pair(1, 0)); // Move player in level 1 (2,5) -> (3,5) is usually free
         assertTrue(controller.getLevelScore() > initialScore);
+    }
+
+    @Test
+    public void globalScoreSumsOnlyCompletedLevels() {
+        GameController controller = new GameController();
+
+        controller.movePlayer(new Pair(1, 0));
+        assertEquals(0, controller.getGlobalScore());
+
+        assertTrue(controller.nextLevel());
+        assertEquals(2, controller.getLevelNumber());
+        assertEquals(0, controller.getGlobalScore());
+
+        solveLevelTwo(controller);
+
+        assertTrue(controller.isSolved());
+        assertEquals(7, controller.getLevelScore());
+        assertEquals(7, controller.getGlobalScore());
+
+        assertTrue(controller.nextLevel());
+        assertEquals(3, controller.getLevelNumber());
+        assertEquals(0, controller.getLevelScore());
+        assertEquals(7, controller.getGlobalScore());
+    }
+
+    @Test
+    public void globalScoreIncludesLastCompletedLevelWhenNoMoreLevels() {
+        GameController controller = new GameController();
+
+        assertTrue(controller.nextLevel());
+        solveLevelTwo(controller);
+        assertTrue(controller.nextLevel());
+        solveLevelThree(controller);
+
+        assertTrue(controller.isSolved());
+        assertEquals(17, controller.getLevelScore());
+        assertEquals(24, controller.getGlobalScore());
+
+        assertFalse(controller.nextLevel());
+        assertEquals(3, controller.getLevelNumber());
+        assertEquals(17, controller.getLevelScore());
+        assertEquals(24, controller.getGlobalScore());
     }
 
     @Test
@@ -179,5 +222,45 @@ public class AppTest {
         boardService.addActor(board, new Pair(0, 0), new Box());
 
         assertFalse(boardService.isSolved(board));
+    }
+
+    private void solveLevelTwo(GameController controller) {
+        move(
+                controller,
+                new Pair(0, -1),
+                new Pair(1, 0),
+                new Pair(1, 0),
+                new Pair(0, 1),
+                new Pair(0, -1),
+                new Pair(1, 0),
+                new Pair(0, 1));
+    }
+
+    private void solveLevelThree(GameController controller) {
+        move(
+                controller,
+                new Pair(0, -1),
+                new Pair(1, 0),
+                new Pair(1, 0),
+                new Pair(0, 1),
+                new Pair(0, 1),
+                new Pair(0, -1),
+                new Pair(0, -1),
+                new Pair(1, 0),
+                new Pair(1, 0),
+                new Pair(0, 1),
+                new Pair(0, 1),
+                new Pair(0, -1),
+                new Pair(0, -1),
+                new Pair(1, 0),
+                new Pair(1, 0),
+                new Pair(0, 1),
+                new Pair(0, 1));
+    }
+
+    private void move(GameController controller, Pair... directions) {
+        for (Pair direction : directions) {
+            controller.movePlayer(direction);
+        }
     }
 }
