@@ -115,16 +115,19 @@ class BoardServiceImpl implements BoardService {
             return false;
         Board.MoveRecord record = board.getMoveHistory().remove(board.getMoveHistory().size() - 1);
 
+        moveActor(board, record.getPlayerTo(), record.getPlayerFrom());
+        board.setPlayerPosition(record.getPlayerFrom());
+
         if (record.getBoxFrom() != null && record.getBoxTo() != null) {
             moveActor(board, record.getBoxTo(), record.getBoxFrom());
+        }
+
+        updateActorGoalFlag(board, record.getPlayerFrom());
+        updateActorGoalFlag(board, record.getPlayerTo());
+        if (record.getBoxFrom() != null && record.getBoxTo() != null) {
             updateActorGoalFlag(board, record.getBoxFrom());
             updateActorGoalFlag(board, record.getBoxTo());
         }
-
-        moveActor(board, record.getPlayerTo(), record.getPlayerFrom());
-        board.setPlayerPosition(record.getPlayerFrom());
-        updateActorGoalFlag(board, record.getPlayerFrom());
-        updateActorGoalFlag(board, record.getPlayerTo());
 
         return true;
     }

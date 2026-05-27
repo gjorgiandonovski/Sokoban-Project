@@ -7,8 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import es.upm.pproject.sokoban.controller.GameController;
 import es.upm.pproject.sokoban.model.dto.Pair;
@@ -65,6 +67,32 @@ public class AppTest {
 
         controller.movePlayer(new Pair(1, 0)); // Move player in level 1 (2,5) -> (3,5) is usually free
         assertTrue(controller.getLevelScore() > initialScore);
+    }
+
+    @Test
+    public void savedGameRestoresBoardScoresAndUndoHistory(@TempDir Path tempDirectory) throws Exception {
+        GameController controller = new GameController();
+        String initialRender = controller.getBoardService().render(controller.getBoard());
+
+        controller.movePlayer(new Pair(1, 0));
+        String movedRender = controller.getBoardService().render(controller.getBoard());
+        Path saveFile = tempDirectory.resolve("saved-game.sok");
+
+        controller.saveGame(saveFile);
+
+        GameController loadedController = new GameController();
+        loadedController.loadGame(saveFile);
+
+        assertEquals(controller.getLevelNumber(), loadedController.getLevelNumber());
+        assertEquals(controller.getLevelName(), loadedController.getLevelName());
+        assertEquals(1, loadedController.getLevelScore());
+        assertEquals(controller.getGlobalScore(), loadedController.getGlobalScore());
+        assertEquals(movedRender, loadedController.getBoardService().render(loadedController.getBoard()));
+
+        loadedController.undoMove();
+
+        assertEquals(0, loadedController.getLevelScore());
+        assertEquals(initialRender, loadedController.getBoardService().render(loadedController.getBoard()));
     }
 
     @Test
@@ -174,6 +202,20 @@ public class AppTest {
         assertTrue(boardService.tryMovePlayer(board, new Pair(1, 0)));
         assertEquals(new Pair(1, 0), boardService.findPlayer(board));
         assertEquals(Type.BOX, boardService.get(board, 2, 0).type());
+    }
+
+    @Test
+    public void undoAfterPushingBoxRestoresPlayerAndBox() {
+        Board board = new Board(1, 4);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+        boardService.addActor(board, new Pair(1, 0), new Box());
+
+        assertTrue(boardService.tryMovePlayer(board, new Pair(1, 0)));
+        assertTrue(boardService.undo(board));
+
+        assertEquals(new Pair(0, 0), boardService.findPlayer(board));
+        assertEquals(Type.PLAYER, boardService.get(board, 0, 0).type());
+        assertEquals(Type.BOX, boardService.get(board, 1, 0).type());
     }
 
     @Test
