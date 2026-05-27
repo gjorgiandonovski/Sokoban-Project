@@ -1,6 +1,10 @@
 package es.upm.pproject.sokoban.model.dto;
 
-public final class Pair implements Comparable<Pair> {
+import java.io.Serializable;
+
+public final class Pair implements Comparable<Pair>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final int x;
     private final int y;
 

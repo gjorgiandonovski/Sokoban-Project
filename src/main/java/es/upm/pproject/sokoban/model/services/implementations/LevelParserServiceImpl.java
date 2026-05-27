@@ -63,7 +63,7 @@ class LevelParserServiceImpl implements LevelParserService {
         int[] boardDimensions = parseDimensions(dimensions, sourceName);
         int rows = boardDimensions[0];
         int columns = boardDimensions[1];
-        Board board = new Board(rows, columns);
+        Board board = new Board(levelName, rows, columns);
         LevelCounts counts = new LevelCounts();
 
         for (int row = 0; row < rows; row++) {

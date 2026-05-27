@@ -1,6 +1,8 @@
 package es.upm.pproject.sokoban.model.dto;
 
 public class Player implements IObject {
+    private static final long serialVersionUID = 1L;
+
     private boolean onGoalPos;
 
     public Player() {

@@ -1,6 +1,8 @@
 package es.upm.pproject.sokoban.model.dto;
 
-public interface IObject {
+import java.io.Serializable;
+
+public interface IObject extends Serializable {
     Type type();
 
     @Override

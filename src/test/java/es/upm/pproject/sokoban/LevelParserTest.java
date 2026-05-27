@@ -30,6 +30,7 @@ public class LevelParserTest {
 
         assertEquals(3, board.getRows());
         assertEquals(5, board.getColumns());
+        assertEquals("Simple", board.getLevelName());
         assertEquals(new Pair(1, 1), boardService.findPlayer(board));
         assertEquals(Type.WALL, boardService.get(board, 0, 0).type());
         assertEquals(Type.PLAYER, boardService.get(board, 1, 1).type());
@@ -39,6 +40,7 @@ public class LevelParserTest {
 
     @Test
     public void parsesBundledLevelResources() {
+        assertEquals("Initial level", levelParserService.parseResource("level 1.txt", boardService).getLevelName());
         assertEquals(9, levelParserService.parseResource("level 1.txt", boardService).getRows());
         assertEquals(7, levelParserService.parseResource("level 2.txt", boardService).getRows());
         assertEquals(7, levelParserService.parseResource("level 3.txt", boardService).getRows());

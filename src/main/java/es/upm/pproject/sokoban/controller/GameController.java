@@ -1,7 +1,15 @@
 package es.upm.pproject.sokoban.controller;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import es.upm.pproject.sokoban.model.dto.Pair;
 import es.upm.pproject.sokoban.model.dto.Board;
+import es.upm.pproject.sokoban.model.dto.IObject;
 import es.upm.pproject.sokoban.model.services.implementations.ServiceFactory;
 import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
 import es.upm.pproject.sokoban.model.services.interfaces.PairService;
@@ -54,6 +62,14 @@ public class GameController {
         this.levelScore = INITIAL_SCORE;
     }
 
+    public void startNewGame() {
+        this.levelNumber = INITIAL_LEVEL;
+        this.levelScore = INITIAL_SCORE;
+        this.globalScore = INITIAL_SCORE;
+        this.currentLevelScoreRecorded = false;
+        this.board = loadLevel(levelNumber);
+    }
+
     public boolean nextLevel() {
         recordCurrentLevelScoreIfSolved();
         int nextLevelNumber = levelNumber + 1;
@@ -71,6 +87,26 @@ public class GameController {
 
     public Board getBoard() {
         return board;
+    }
+
+    public String getLevelName() {
+        return board.getLevelName();
+    }
+
+    public int getBoardRows() {
+        return board.getRows();
+    }
+
+    public int getBoardColumns() {
+        return board.getColumns();
+    }
+
+    public IObject getTerrainAt(int x, int y) {
+        return board.getTerrain().get(new Pair(x, y));
+    }
+
+    public IObject getActorAt(int x, int y) {
+        return board.getActors().get(new Pair(x, y));
     }
 
     public int getLevelScore() {
@@ -139,6 +175,43 @@ public class GameController {
         return character == 'u' || character == 'U';
     }
 
+    public void saveGame(Path saveFile) throws IOException {
+        if (saveFile == null) {
+            throw new IllegalArgumentException("Save file cannot be null");
+        }
+
+        SaveGameState state = new SaveGameState(
+            levelNumber,
+            board,
+            levelScore,
+            globalScore,
+            currentLevelScoreRecorded
+        );
+        try (ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(saveFile))) {
+            output.writeObject(state);
+        }
+    }
+
+    public void loadGame(Path saveFile) throws IOException {
+        if (saveFile == null) {
+            throw new IllegalArgumentException("Save file cannot be null");
+        }
+
+        Object loadedObject;
+        try (ObjectInputStream input = new ObjectInputStream(Files.newInputStream(saveFile))) {
+            loadedObject = input.readObject();
+        } catch (ClassNotFoundException exception) {
+            throw new IOException("Saved game format is not supported", exception);
+        }
+
+        if (!(loadedObject instanceof SaveGameState)) {
+            throw new IOException("Selected file is not a saved Sokoban game");
+        }
+
+        SaveGameState state = (SaveGameState) loadedObject;
+        restore(state);
+    }
+
     private void recordCurrentLevelScoreIfSolved() {
         if (!currentLevelScoreRecorded && isSolved()) {
             globalScore += levelScore;
@@ -150,6 +223,45 @@ public class GameController {
         if (currentLevelScoreRecorded) {
             globalScore = Math.max(INITIAL_SCORE, globalScore - levelScore);
             currentLevelScoreRecorded = false;
+        }
+    }
+
+    private void restore(SaveGameState state) throws IOException {
+        if (state.board == null) {
+            throw new IOException("Saved game does not contain a board");
+        }
+        if (state.levelNumber < INITIAL_LEVEL || state.levelScore < INITIAL_SCORE || state.globalScore < INITIAL_SCORE) {
+            throw new IOException("Saved game contains invalid score or level values");
+        }
+
+        this.levelNumber = state.levelNumber;
+        this.board = state.board;
+        this.levelScore = state.levelScore;
+        this.globalScore = state.globalScore;
+        this.currentLevelScoreRecorded = state.currentLevelScoreRecorded;
+    }
+
+    private static final class SaveGameState implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final int levelNumber;
+        private final Board board;
+        private final int levelScore;
+        private final int globalScore;
+        private final boolean currentLevelScoreRecorded;
+
+        private SaveGameState(
+            int levelNumber,
+            Board board,
+            int levelScore,
+            int globalScore,
+            boolean currentLevelScoreRecorded
+        ) {
+            this.levelNumber = levelNumber;
+            this.board = board;
+            this.levelScore = levelScore;
+            this.globalScore = globalScore;
+            this.currentLevelScoreRecorded = currentLevelScoreRecorded;
         }
     }
 }
