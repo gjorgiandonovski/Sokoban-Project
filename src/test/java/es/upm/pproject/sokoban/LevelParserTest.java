@@ -8,9 +8,17 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
-import es.upm.pproject.sokoban.GameObjects.Type;
+import es.upm.pproject.sokoban.model.dto.Pair;
+import es.upm.pproject.sokoban.model.dto.Board;
+import es.upm.pproject.sokoban.model.dto.Type;
+import es.upm.pproject.sokoban.model.services.implementations.ServiceFactory;
+import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
+import es.upm.pproject.sokoban.model.services.interfaces.LevelParserService;
 
 public class LevelParserTest {
+    private final BoardService boardService = ServiceFactory.createBoardService();
+    private final LevelParserService levelParserService = ServiceFactory.createLevelParserService();
+
     @Test
     public void parsesValidLevelFile() {
         Board board = parse(
@@ -22,18 +30,18 @@ public class LevelParserTest {
 
         assertEquals(3, board.getRows());
         assertEquals(5, board.getColumns());
-        assertEquals(new Pair(1, 1), board.findPlayer());
-        assertEquals(Type.WALL, board.get(0, 0).type());
-        assertEquals(Type.PLAYER, board.get(1, 1).type());
-        assertEquals(Type.BOX, board.get(2, 1).type());
-        assertEquals(Type.GOALPOSITION, board.get(3, 1).type());
+        assertEquals(new Pair(1, 1), boardService.findPlayer(board));
+        assertEquals(Type.WALL, boardService.get(board, 0, 0).type());
+        assertEquals(Type.PLAYER, boardService.get(board, 1, 1).type());
+        assertEquals(Type.BOX, boardService.get(board, 2, 1).type());
+        assertEquals(Type.GOALPOSITION, boardService.get(board, 3, 1).type());
     }
 
     @Test
     public void parsesBundledLevelResources() {
-        assertEquals(9, LevelParser.parseResource("level 1.txt").getRows());
-        assertEquals(7, LevelParser.parseResource("level 2.txt").getRows());
-        assertEquals(7, LevelParser.parseResource("level 3.txt").getRows());
+        assertEquals(9, levelParserService.parseResource("level 1.txt", boardService).getRows());
+        assertEquals(7, levelParserService.parseResource("level 2.txt", boardService).getRows());
+        assertEquals(7, levelParserService.parseResource("level 3.txt", boardService).getRows());
     }
 
     @Test
@@ -91,8 +99,9 @@ public class LevelParserTest {
     }
 
     private Board parse(String level) {
-        return LevelParser.parse(
+        return levelParserService.parse(
                 new ByteArrayInputStream(level.getBytes(StandardCharsets.UTF_8)),
-                "test-level.txt");
+                "test-level.txt",
+                boardService);
     }
 }
