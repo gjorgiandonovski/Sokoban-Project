@@ -6,6 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import es.upm.pproject.sokoban.model.dto.Pair;
 import es.upm.pproject.sokoban.model.dto.Board;
 import es.upm.pproject.sokoban.model.dto.Box;
@@ -16,6 +19,7 @@ import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
 import es.upm.pproject.sokoban.model.services.interfaces.LevelParserService;
 
 class LevelParserServiceImpl implements LevelParserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LevelParserServiceImpl.class);
     private static final char WALL = '+';
     private static final char GOAL = '*';
     private static final char BOX = '#';
@@ -80,6 +84,15 @@ class LevelParserServiceImpl implements LevelParserService {
         }
 
         validateObjectCounts(sourceName, counts);
+        LOGGER.info(
+            "Parsed level {} with size {}x{} (players={}, boxes={}, goals={})",
+            levelName,
+            rows,
+            columns,
+            counts.players,
+            counts.boxes,
+            counts.goals
+        );
         return board;
     }
 

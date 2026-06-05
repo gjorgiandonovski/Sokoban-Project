@@ -2,6 +2,9 @@ package es.upm.pproject.sokoban.model.services.implementations;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import es.upm.pproject.sokoban.model.dto.Pair;
 import es.upm.pproject.sokoban.model.dto.Board;
 import es.upm.pproject.sokoban.model.dto.IObject;
@@ -10,6 +13,7 @@ import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
 import es.upm.pproject.sokoban.model.services.interfaces.PairService;
 
 class BoardServiceImpl implements BoardService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BoardServiceImpl.class);
 
     private final PairService pairService = ServiceFactory.createPairService();
 
@@ -62,10 +66,14 @@ class BoardServiceImpl implements BoardService {
     @Override
     public boolean tryMovePlayer(Board board, Pair direction) {
         Pair playerPos = board.getPlayerPosition();
-        if (playerPos == null)
+        if (playerPos == null) {
+            LOGGER.debug("Cannot move player because the board has no player");
             return false;
-        if (!pairService.isCardinalDirection(direction))
+        }
+        if (!pairService.isCardinalDirection(direction)) {
+            LOGGER.debug("Rejected non-cardinal direction {}", direction);
             return false;
+        }
 
         Pair from = playerPos;
         Pair to = pairService.add(from, direction);
@@ -82,6 +90,7 @@ class BoardServiceImpl implements BoardService {
             updateActorGoalFlag(board, to);
             updateActorGoalFlag(board, from);
             board.getMoveHistory().add(new Board.MoveRecord(from, to, null, null));
+            LOGGER.debug("Player moved from {} to {}", from, to);
             return true;
         }
 
@@ -106,6 +115,7 @@ class BoardServiceImpl implements BoardService {
         updateActorGoalFlag(board, from);
 
         board.getMoveHistory().add(new Board.MoveRecord(from, to, to, boxTo));
+        LOGGER.debug("Player moved from {} to {} and pushed box to {}", from, to, boxTo);
         return true;
     }
 
@@ -129,6 +139,7 @@ class BoardServiceImpl implements BoardService {
             updateActorGoalFlag(board, record.getBoxTo());
         }
 
+        LOGGER.debug("Undo restored player from {} to {}", record.getPlayerTo(), record.getPlayerFrom());
         return true;
     }
 

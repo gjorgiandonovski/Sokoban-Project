@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import es.upm.pproject.sokoban.model.dto.Pair;
 import es.upm.pproject.sokoban.model.dto.Board;
 import es.upm.pproject.sokoban.model.dto.IObject;
@@ -18,6 +21,7 @@ import es.upm.pproject.sokoban.model.services.interfaces.LevelParserService;
 public class GameController {
     private static final int INITIAL_LEVEL = 1;
     private static final int INITIAL_SCORE = 0;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
 
     private final BoardService boardService;
     private final PairService pairService;
@@ -37,6 +41,7 @@ public class GameController {
         this.globalScore = INITIAL_SCORE;
         this.currentLevelScoreRecorded = false;
         this.board = loadLevel(levelNumber);
+        LOGGER.info("Game controller initialized at level {}", levelNumber);
     }
 
     public void movePlayer(Pair direction) {
@@ -45,6 +50,9 @@ public class GameController {
             if (moved) {
                 clearCurrentLevelScoreRecord();
                 levelScore++;
+                LOGGER.debug("Player moved {} on level {}; score={}", direction, levelNumber, levelScore);
+            } else {
+                LOGGER.debug("Blocked move {} on level {}", direction, levelNumber);
             }
         }
     }
@@ -53,6 +61,9 @@ public class GameController {
         if (boardService.undo(board)) {
             clearCurrentLevelScoreRecord();
             levelScore = Math.max(INITIAL_SCORE, levelScore - 1);
+            LOGGER.info("Undo applied on level {}; score={}", levelNumber, levelScore);
+        } else {
+            LOGGER.debug("Undo ignored because move history is empty on level {}", levelNumber);
         }
     }
 
@@ -60,6 +71,7 @@ public class GameController {
         clearCurrentLevelScoreRecord();
         this.board = loadLevel(levelNumber);
         this.levelScore = INITIAL_SCORE;
+        LOGGER.info("Level {} restarted", levelNumber);
     }
 
     public void startNewGame() {
@@ -68,6 +80,7 @@ public class GameController {
         this.globalScore = INITIAL_SCORE;
         this.currentLevelScoreRecorded = false;
         this.board = loadLevel(levelNumber);
+        LOGGER.info("New game started");
     }
 
     public boolean nextLevel() {
@@ -79,8 +92,10 @@ public class GameController {
             this.board = nextBoard;
             this.levelScore = INITIAL_SCORE;
             this.currentLevelScoreRecorded = false;
+            LOGGER.info("Advanced to level {}", levelNumber);
             return true;
         } catch (Exception e) {
+            LOGGER.info("No next level available after level {}", levelNumber);
             return false;
         }
     }
@@ -138,6 +153,7 @@ public class GameController {
 
     public void handleInput(String input) {
         if (input == null || input.isEmpty() || input.length() != 1) {
+            LOGGER.debug("Ignoring invalid input: {}", input);
             return;
         }
 
@@ -154,7 +170,10 @@ public class GameController {
 
     public Board loadLevel(int level) {
         String fileName = "level " + level + ".txt";
-        return levelParserService.parseResource(fileName, boardService);
+        LOGGER.info("Loading level resource {}", fileName);
+        Board loadedBoard = levelParserService.parseResource(fileName, boardService);
+        LOGGER.info("Loaded level {} ({})", level, loadedBoard.getLevelName());
+        return loadedBoard;
     }
 
     public Pair directionFromInput(char character) {
@@ -190,6 +209,7 @@ public class GameController {
         try (ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(saveFile))) {
             output.writeObject(state);
         }
+        LOGGER.info("Game saved to {}", saveFile);
     }
 
     public void loadGame(Path saveFile) throws IOException {
@@ -210,12 +230,14 @@ public class GameController {
 
         SaveGameState state = (SaveGameState) loadedObject;
         restore(state);
+        LOGGER.info("Game loaded from {} at level {}", saveFile, levelNumber);
     }
 
     private void recordCurrentLevelScoreIfSolved() {
         if (!currentLevelScoreRecorded && isSolved()) {
             globalScore += levelScore;
             currentLevelScoreRecorded = true;
+            LOGGER.info("Recorded score for level {}; global score={}", levelNumber, globalScore);
         }
     }
 
@@ -239,6 +261,7 @@ public class GameController {
         this.levelScore = state.levelScore;
         this.globalScore = state.globalScore;
         this.currentLevelScoreRecorded = state.currentLevelScoreRecorded;
+        LOGGER.info("Restored game state at level {} with score {}", levelNumber, levelScore);
     }
 
     private static final class SaveGameState implements Serializable {
