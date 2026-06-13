@@ -286,7 +286,7 @@ public class AppTest {
 
     @Test
     public void playerCannotMoveIntoNonBoxOccupant() {
-        Board board = new Board(3, 1);
+        Board board = new Board(1, 3);
         boardService.addActor(board, new Pair(0, 0), new Player());
         board.getActors().put(new Pair(1, 0), new Player());
 
@@ -386,6 +386,16 @@ public class AppTest {
     }
 
     @Test
+    public void undoIgnoresBoxRecordWithoutDestination() {
+        Board board = new Board(1, 3);
+        boardService.addActor(board, new Pair(1, 0), new Player());
+        board.getMoveHistory().add(new Board.MoveRecord(new Pair(0, 0), new Pair(1, 0), new Pair(2, 0), null));
+
+        assertTrue(boardService.undo(board));
+        assertEquals(new Pair(0, 0), boardService.findPlayer(board));
+    }
+
+    @Test
     public void undoHandlesMoveRecordWithoutActorAtRecordedDestination() {
         Board board = new Board(1, 2);
         boardService.addActor(board, new Pair(0, 0), new Player());
@@ -451,9 +461,11 @@ public class AppTest {
 
     @Test
     public void levelIsNotSolvedWhenBoxIsOnNonGoalTerrain() {
-        Board board = new Board(1, 1);
-        board.getTerrain().put(new Pair(0, 0), new Wall());
+        Board board = new Board(1, 3);
+        boardService.addTerrain(board, new Pair(0, 0), new GoalPosition());
         board.getActors().put(new Pair(0, 0), new Box());
+        board.getTerrain().put(new Pair(1, 0), new Wall());
+        board.getActors().put(new Pair(1, 0), new Box());
 
         assertFalse(boardService.isSolved(board));
     }
