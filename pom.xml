@@ -29,13 +29,18 @@
         <maven.jar>3.2.0</maven.jar>
         <maven.install>3.0.0-M1</maven.install>
         
+        <sonar.id>local</sonar.id>
         <sonar.language>java</sonar.language>
         <sonar.host.url>https://costa.ls.fi.upm.es/sonar</sonar.host.url>
         <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
         <sonar.projectName>${project.name}-${sonar.id}</sonar.projectName>
-        <sonar.projectKey>${project.groupId}:${project.artifactId}:${sonar.projectName}:${sonar.id}</sonar.projectKey>
-        
-        <sonar.coverage.exclusions>**/view/**,**/controller/**</sonar.coverage.exclusions>
+        <sonar.projectKey>${project.groupId}:${project.artifactId}:${sonar.id}</sonar.projectKey>
+        <sonar.sources>src/main/java</sonar.sources>
+        <sonar.tests>src/test/java</sonar.tests>
+        <sonar.java.binaries>${project.build.directory}/classes</sonar.java.binaries>
+        <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.exclusions>**/App.java,**/view/**,**/controller/**</sonar.coverage.exclusions>
         <jacoco.version>0.8.6</jacoco.version>
         <sonar.scm.provider>git</sonar.scm.provider>
     </properties>

@@ -16,6 +16,12 @@ Compile and run the tests:
 mvn test
 ```
 
+Run the full verification pipeline used by SonarQube:
+
+```sh
+mvn clean verify
+```
+
 Run the graphical version:
 
 ```sh
@@ -40,6 +46,37 @@ To run the JAR in console mode:
 ```sh
 java -jar target/sokoban-1.0-SNAPSHOT.jar --console
 ```
+
+## SonarQube
+
+The Maven build is configured for the course SonarQube server:
+
+```text
+https://costa.ls.fi.upm.es/sonar
+```
+
+Coverage is imported from JaCoCo and only the model code is counted for the
+coverage metric. The following classes are excluded from Sonar coverage:
+
+- `App.java`
+- `controller/**`
+- `view/**`
+
+To publish an analysis, run:
+
+```sh
+mvn clean verify sonar:sonar -Dsonar.id=<your-team-id>
+```
+
+If the server requires authentication, add your token:
+
+```sh
+mvn clean verify sonar:sonar -Dsonar.id=<your-team-id> -Dsonar.token=<your-token>
+```
+
+`sonar.id` is used to make the project key unique on the shared server. Replace
+`<your-team-id>` with your group or repository identifier before the final
+submission.
 
 ## Files Read and Written by the Application
 

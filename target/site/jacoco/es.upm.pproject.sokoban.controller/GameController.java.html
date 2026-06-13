@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sokoban</a> &gt; <a href="index.source.html" class="el_package">es.upm.pproject.sokoban.controller</a> &gt; <span class="el_source">GameController.java</span></div><h1>GameController.java</h1><pre class="source lang-java linenums">package es.upm.pproject.sokoban.controller;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import es.upm.pproject.sokoban.model.dto.Pair;
+import es.upm.pproject.sokoban.model.dto.Board;
+import es.upm.pproject.sokoban.model.dto.IObject;
+import es.upm.pproject.sokoban.model.services.implementations.ServiceFactory;
+import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
+import es.upm.pproject.sokoban.model.services.interfaces.PairService;
+import es.upm.pproject.sokoban.model.services.interfaces.LevelParserService;
+
+public class GameController {
+    private static final int INITIAL_LEVEL = 1;
+    private static final int INITIAL_SCORE = 0;
+<span class="fc" id="L24">    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);</span>
+
+    private final BoardService boardService;
+    private final PairService pairService;
+    private final LevelParserService levelParserService;
+    private Board board;
+    private int levelNumber;
+    private int levelScore;
+    private int globalScore;
+    private boolean currentLevelScoreRecorded;
+
+<span class="fc" id="L35">    public GameController() {</span>
+<span class="fc" id="L36">        this.boardService = ServiceFactory.createBoardService();</span>
+<span class="fc" id="L37">        this.pairService = ServiceFactory.createPairService();</span>
+<span class="fc" id="L38">        this.levelParserService = ServiceFactory.createLevelParserService();</span>
+<span class="fc" id="L39">        this.levelNumber = INITIAL_LEVEL;</span>
+<span class="fc" id="L40">        this.levelScore = INITIAL_SCORE;</span>
+<span class="fc" id="L41">        this.globalScore = INITIAL_SCORE;</span>
+<span class="fc" id="L42">        this.currentLevelScoreRecorded = false;</span>
+<span class="fc" id="L43">        this.board = loadLevel(levelNumber);</span>
+<span class="fc" id="L44">        LOGGER.info(&quot;Game controller initialized at level {}&quot;, levelNumber);</span>
+<span class="fc" id="L45">    }</span>
+
+    public void movePlayer(Pair direction) {
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        if (direction != null) {</span>
+<span class="fc" id="L49">            boolean moved = boardService.tryMovePlayer(board, direction);</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">            if (moved) {</span>
+<span class="fc" id="L51">                clearCurrentLevelScoreRecord();</span>
+<span class="fc" id="L52">                levelScore++;</span>
+<span class="fc" id="L53">                LOGGER.debug(&quot;Player moved {} on level {}; score={}&quot;, direction, levelNumber, levelScore);</span>
+            } else {
+<span class="nc" id="L55">                LOGGER.debug(&quot;Blocked move {} on level {}&quot;, direction, levelNumber);</span>
+            }
+        }
+<span class="fc" id="L58">    }</span>
+
+    public void undoMove() {
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        if (boardService.undo(board)) {</span>
+<span class="fc" id="L62">            clearCurrentLevelScoreRecord();</span>
+<span class="fc" id="L63">            levelScore = Math.max(INITIAL_SCORE, levelScore - 1);</span>
+<span class="fc" id="L64">            LOGGER.info(&quot;Undo applied on level {}; score={}&quot;, levelNumber, levelScore);</span>
+        } else {
+<span class="nc" id="L66">            LOGGER.debug(&quot;Undo ignored because move history is empty on level {}&quot;, levelNumber);</span>
+        }
+<span class="fc" id="L68">    }</span>
+
+    public void restartLevel() {
+<span class="fc" id="L71">        clearCurrentLevelScoreRecord();</span>
+<span class="fc" id="L72">        this.board = loadLevel(levelNumber);</span>
+<span class="fc" id="L73">        this.levelScore = INITIAL_SCORE;</span>
+<span class="fc" id="L74">        LOGGER.info(&quot;Level {} restarted&quot;, levelNumber);</span>
+<span class="fc" id="L75">    }</span>
+
+    public void startNewGame() {
+<span class="nc" id="L78">        this.levelNumber = INITIAL_LEVEL;</span>
+<span class="nc" id="L79">        this.levelScore = INITIAL_SCORE;</span>
+<span class="nc" id="L80">        this.globalScore = INITIAL_SCORE;</span>
+<span class="nc" id="L81">        this.currentLevelScoreRecorded = false;</span>
+<span class="nc" id="L82">        this.board = loadLevel(levelNumber);</span>
+<span class="nc" id="L83">        LOGGER.info(&quot;New game started&quot;);</span>
+<span class="nc" id="L84">    }</span>
+
+    public boolean nextLevel() {
+<span class="fc" id="L87">        recordCurrentLevelScoreIfSolved();</span>
+<span class="fc" id="L88">        int nextLevelNumber = levelNumber + 1;</span>
+        try {
+<span class="fc" id="L90">            Board nextBoard = loadLevel(nextLevelNumber);</span>
+<span class="fc" id="L91">            this.levelNumber = nextLevelNumber;</span>
+<span class="fc" id="L92">            this.board = nextBoard;</span>
+<span class="fc" id="L93">            this.levelScore = INITIAL_SCORE;</span>
+<span class="fc" id="L94">            this.currentLevelScoreRecorded = false;</span>
+<span class="fc" id="L95">            LOGGER.info(&quot;Advanced to level {}&quot;, levelNumber);</span>
+<span class="fc" id="L96">            return true;</span>
+<span class="fc" id="L97">        } catch (Exception e) {</span>
+<span class="fc" id="L98">            LOGGER.info(&quot;No next level available after level {}&quot;, levelNumber);</span>
+<span class="fc" id="L99">            return false;</span>
+        }
+    }
+
+    public Board getBoard() {
+<span class="fc" id="L104">        return board;</span>
+    }
+
+    public String getLevelName() {
+<span class="fc" id="L108">        return board.getLevelName();</span>
+    }
+
+    public int getBoardRows() {
+<span class="nc" id="L112">        return board.getRows();</span>
+    }
+
+    public int getBoardColumns() {
+<span class="nc" id="L116">        return board.getColumns();</span>
+    }
+
+    public IObject getTerrainAt(int x, int y) {
+<span class="nc" id="L120">        return board.getTerrain().get(new Pair(x, y));</span>
+    }
+
+    public IObject getActorAt(int x, int y) {
+<span class="nc" id="L124">        return board.getActors().get(new Pair(x, y));</span>
+    }
+
+    public int getLevelScore() {
+<span class="fc" id="L128">        return levelScore;</span>
+    }
+
+    public int getGlobalScore() {
+<span class="fc bfc" id="L132" title="All 4 branches covered.">        if (!currentLevelScoreRecorded &amp;&amp; isSolved()) {</span>
+<span class="fc" id="L133">            return globalScore + levelScore;</span>
+        }
+<span class="fc" id="L135">        return globalScore;</span>
+    }
+
+    public int getLevelNumber() {
+<span class="fc" id="L139">        return levelNumber;</span>
+    }
+
+    public boolean isSolved() {
+<span class="fc" id="L143">        return boardService.isSolved(board);</span>
+    }
+
+    public BoardService getBoardService() {
+<span class="fc" id="L147">        return boardService;</span>
+    }
+
+    public PairService getPairService() {
+<span class="nc" id="L151">        return pairService;</span>
+    }
+
+    public void handleInput(String input) {
+<span class="nc bnc" id="L155" title="All 6 branches missed.">        if (input == null || input.isEmpty() || input.length() != 1) {</span>
+<span class="nc" id="L156">            LOGGER.debug(&quot;Ignoring invalid input: {}&quot;, input);</span>
+<span class="nc" id="L157">            return;</span>
+        }
+
+<span class="nc" id="L160">        char command = input.charAt(0);</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">        if (isRestartInput(command)) {</span>
+<span class="nc" id="L162">            restartLevel();</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">        } else if (isUndoInput(command)) {</span>
+<span class="nc" id="L164">            undoMove();</span>
+        } else {
+<span class="nc" id="L166">            Pair direction = directionFromInput(command);</span>
+<span class="nc" id="L167">            movePlayer(direction);</span>
+        }
+<span class="nc" id="L169">    }</span>
+
+    public Board loadLevel(int level) {
+<span class="fc" id="L172">        String fileName = &quot;level &quot; + level + &quot;.txt&quot;;</span>
+<span class="fc" id="L173">        LOGGER.info(&quot;Loading level resource {}&quot;, fileName);</span>
+<span class="fc" id="L174">        Board loadedBoard = levelParserService.parseResource(fileName, boardService);</span>
+<span class="fc" id="L175">        LOGGER.info(&quot;Loaded level {} ({})&quot;, level, loadedBoard.getLevelName());</span>
+<span class="fc" id="L176">        return loadedBoard;</span>
+    }
+
+    public Pair directionFromInput(char character) {
+<span class="nc bnc" id="L180" title="All 5 branches missed.">        switch (character) {</span>
+<span class="nc" id="L181">            case 'd': case 'D': return new Pair(1, 0);</span>
+<span class="nc" id="L182">            case 'a': case 'A': return new Pair(-1, 0);</span>
+<span class="nc" id="L183">            case 'w': case 'W': return new Pair(0, -1);</span>
+<span class="nc" id="L184">            case 's': case 'S': return new Pair(0, 1);</span>
+<span class="nc" id="L185">            default: return null;</span>
+        }
+    }
+
+    public boolean isRestartInput(char character) {
+<span class="nc bnc" id="L190" title="All 4 branches missed.">        return character == 'r' || character == 'R';</span>
+    }
+
+    public boolean isUndoInput(char character) {
+<span class="nc bnc" id="L194" title="All 4 branches missed.">        return character == 'u' || character == 'U';</span>
+    }
+
+    public void saveGame(Path saveFile) throws IOException {
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">        if (saveFile == null) {</span>
+<span class="nc" id="L199">            throw new IllegalArgumentException(&quot;Save file cannot be null&quot;);</span>
+        }
+
+<span class="fc" id="L202">        SaveGameState state = new SaveGameState(</span>
+            levelNumber,
+            board,
+            levelScore,
+            globalScore,
+            currentLevelScoreRecorded
+        );
+<span class="fc" id="L209">        try (ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(saveFile))) {</span>
+<span class="fc" id="L210">            output.writeObject(state);</span>
+        }
+<span class="fc" id="L212">        LOGGER.info(&quot;Game saved to {}&quot;, saveFile);</span>
+<span class="fc" id="L213">    }</span>
+
+    public void loadGame(Path saveFile) throws IOException {
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">        if (saveFile == null) {</span>
+<span class="nc" id="L217">            throw new IllegalArgumentException(&quot;Save file cannot be null&quot;);</span>
+        }
+
+        Object loadedObject;
+<span class="fc" id="L221">        try (ObjectInputStream input = new ObjectInputStream(Files.newInputStream(saveFile))) {</span>
+<span class="fc" id="L222">            loadedObject = input.readObject();</span>
+<span class="nc" id="L223">        } catch (ClassNotFoundException exception) {</span>
+<span class="nc" id="L224">            throw new IOException(&quot;Saved game format is not supported&quot;, exception);</span>
+<span class="fc" id="L225">        }</span>
+
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">        if (!(loadedObject instanceof SaveGameState)) {</span>
+<span class="nc" id="L228">            throw new IOException(&quot;Selected file is not a saved Sokoban game&quot;);</span>
+        }
+
+<span class="fc" id="L231">        SaveGameState state = (SaveGameState) loadedObject;</span>
+<span class="fc" id="L232">        restore(state);</span>
+<span class="fc" id="L233">        LOGGER.info(&quot;Game loaded from {} at level {}&quot;, saveFile, levelNumber);</span>
+<span class="fc" id="L234">    }</span>
+
+    private void recordCurrentLevelScoreIfSolved() {
+<span class="pc bpc" id="L237" title="1 of 4 branches missed.">        if (!currentLevelScoreRecorded &amp;&amp; isSolved()) {</span>
+<span class="fc" id="L238">            globalScore += levelScore;</span>
+<span class="fc" id="L239">            currentLevelScoreRecorded = true;</span>
+<span class="fc" id="L240">            LOGGER.info(&quot;Recorded score for level {}; global score={}&quot;, levelNumber, globalScore);</span>
+        }
+<span class="fc" id="L242">    }</span>
+
+    private void clearCurrentLevelScoreRecord() {
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">        if (currentLevelScoreRecorded) {</span>
+<span class="nc" id="L246">            globalScore = Math.max(INITIAL_SCORE, globalScore - levelScore);</span>
+<span class="nc" id="L247">            currentLevelScoreRecorded = false;</span>
+        }
+<span class="fc" id="L249">    }</span>
+
+    private void restore(SaveGameState state) throws IOException {
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">        if (state.board == null) {</span>
+<span class="nc" id="L253">            throw new IOException(&quot;Saved game does not contain a board&quot;);</span>
+        }
+<span class="pc bpc" id="L255" title="3 of 6 branches missed.">        if (state.levelNumber &lt; INITIAL_LEVEL || state.levelScore &lt; INITIAL_SCORE || state.globalScore &lt; INITIAL_SCORE) {</span>
+<span class="nc" id="L256">            throw new IOException(&quot;Saved game contains invalid score or level values&quot;);</span>
+        }
+
+<span class="fc" id="L259">        this.levelNumber = state.levelNumber;</span>
+<span class="fc" id="L260">        this.board = state.board;</span>
+<span class="fc" id="L261">        this.levelScore = state.levelScore;</span>
+<span class="fc" id="L262">        this.globalScore = state.globalScore;</span>
+<span class="fc" id="L263">        this.currentLevelScoreRecorded = state.currentLevelScoreRecorded;</span>
+<span class="fc" id="L264">        LOGGER.info(&quot;Restored game state at level {} with score {}&quot;, levelNumber, levelScore);</span>
+<span class="fc" id="L265">    }</span>
+
+    private static final class SaveGameState implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final int levelNumber;
+        private final Board board;
+        private final int levelScore;
+        private final int globalScore;
+        private final boolean currentLevelScoreRecorded;
+
+        private SaveGameState(
+            int levelNumber,
+            Board board,
+            int levelScore,
+            int globalScore,
+            boolean currentLevelScoreRecorded
+<span class="fc" id="L282">        ) {</span>
+<span class="fc" id="L283">            this.levelNumber = levelNumber;</span>
+<span class="fc" id="L284">            this.board = board;</span>
+<span class="fc" id="L285">            this.levelScore = levelScore;</span>
+<span class="fc" id="L286">            this.globalScore = globalScore;</span>
+<span class="fc" id="L287">            this.currentLevelScoreRecorded = currentLevelScoreRecorded;</span>
+<span class="fc" id="L288">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

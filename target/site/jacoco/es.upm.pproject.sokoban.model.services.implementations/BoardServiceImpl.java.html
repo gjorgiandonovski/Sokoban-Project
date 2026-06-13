@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BoardServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sokoban</a> &gt; <a href="index.source.html" class="el_package">es.upm.pproject.sokoban.model.services.implementations</a> &gt; <span class="el_source">BoardServiceImpl.java</span></div><h1>BoardServiceImpl.java</h1><pre class="source lang-java linenums">package es.upm.pproject.sokoban.model.services.implementations;
+
+import java.util.Map;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import es.upm.pproject.sokoban.model.dto.Pair;
+import es.upm.pproject.sokoban.model.dto.Board;
+import es.upm.pproject.sokoban.model.dto.IObject;
+import es.upm.pproject.sokoban.model.dto.Type;
+import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
+import es.upm.pproject.sokoban.model.services.interfaces.PairService;
+
+<span class="fc" id="L16">class BoardServiceImpl implements BoardService {</span>
+<span class="fc" id="L17">    private static final Logger LOGGER = LoggerFactory.getLogger(BoardServiceImpl.class);</span>
+    private static final String OUTSIDE_BOARD_MESSAGE = &quot;Position is outside the board&quot;;
+
+<span class="fc" id="L20">    private final PairService pairService = ServiceFactory.createPairService();</span>
+
+    @Override
+    public IObject get(Board board, int x, int y) {
+<span class="fc" id="L24">        requireBoard(board);</span>
+<span class="fc" id="L25">        Pair position = new Pair(x, y);</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (!isInside(board, position)) {</span>
+<span class="fc" id="L27">            return null;</span>
+        }
+<span class="fc" id="L29">        return getObjectAt(board, position);</span>
+    }
+
+    @Override
+    public void addTerrain(Board board, Pair position, IObject obj) {
+<span class="fc" id="L34">        requireBoard(board);</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (obj == null) {</span>
+<span class="fc" id="L36">            return;</span>
+        }
+<span class="fc" id="L38">        requireInside(board, position);</span>
+<span class="fc bfc" id="L39" title="All 4 branches covered.">        if (obj.type() != Type.WALL &amp;&amp; obj.type() != Type.GOALPOSITION) {</span>
+<span class="fc" id="L40">            throw new IllegalArgumentException(&quot;Terrain must be WALL or GOALPOSITION&quot;);</span>
+        }
+<span class="fc" id="L42">        board.getTerrain().put(position, obj);</span>
+<span class="fc" id="L43">    }</span>
+
+    @Override
+    public void addActor(Board board, Pair position, IObject obj) {
+<span class="fc" id="L47">        requireBoard(board);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (obj == null) {</span>
+<span class="fc" id="L49">            return;</span>
+        }
+<span class="fc" id="L51">        requireInside(board, position);</span>
+<span class="fc bfc" id="L52" title="All 4 branches covered.">        if (obj.type() != Type.PLAYER &amp;&amp; obj.type() != Type.BOX) {</span>
+<span class="fc" id="L53">            throw new IllegalArgumentException(&quot;Actor must be PLAYER or BOX&quot;);</span>
+        }
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (isWall(board, position)) {</span>
+<span class="fc" id="L56">            throw new IllegalArgumentException(&quot;Actors cannot be placed on walls&quot;);</span>
+        }
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (board.getActors().containsKey(position)) {</span>
+<span class="fc" id="L59">            throw new IllegalArgumentException(&quot;Only one actor can occupy a square&quot;);</span>
+        }
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (obj.type() == Type.PLAYER) {</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            if (board.getPlayerPosition() != null) {</span>
+<span class="fc" id="L63">                throw new IllegalArgumentException(&quot;The board can only have one player&quot;);</span>
+            }
+<span class="fc" id="L65">            board.setPlayerPosition(position);</span>
+        }
+<span class="fc" id="L67">        board.getActors().put(position, obj);</span>
+<span class="fc" id="L68">        updateActorGoalFlag(board, position);</span>
+<span class="fc" id="L69">    }</span>
+
+    @Override
+    public boolean tryMovePlayer(Board board, Pair direction) {
+<span class="fc" id="L73">        requireBoard(board);</span>
+<span class="fc" id="L74">        Pair playerPos = board.getPlayerPosition();</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (playerPos == null) {</span>
+<span class="fc" id="L76">            LOGGER.debug(&quot;Cannot move player because the board has no player&quot;);</span>
+<span class="fc" id="L77">            return false;</span>
+        }
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (!pairService.isCardinalDirection(direction)) {</span>
+<span class="fc" id="L80">            LOGGER.debug(&quot;Rejected non-cardinal direction {}&quot;, direction);</span>
+<span class="fc" id="L81">            return false;</span>
+        }
+
+<span class="fc" id="L84">        Pair from = playerPos;</span>
+<span class="fc" id="L85">        Pair to = pairService.add(from, direction);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (!canEnter(board, to)) {</span>
+<span class="fc" id="L87">            return false;</span>
+        }
+
+<span class="fc" id="L90">        IObject occupant = board.getActors().get(to);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (occupant == null) {</span>
+<span class="fc" id="L92">            return movePlayer(board, from, to);</span>
+        }
+
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (occupant.type() != Type.BOX) {</span>
+<span class="nc" id="L96">            return false;</span>
+        }
+
+<span class="fc" id="L99">        return pushBox(board, from, to, direction);</span>
+    }
+
+    @Override
+    public boolean undo(Board board) {
+<span class="fc" id="L104">        requireBoard(board);</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (board.getMoveHistory().isEmpty()) {</span>
+<span class="fc" id="L106">            return false;</span>
+        }
+<span class="fc" id="L108">        Board.MoveRecord record = board.getMoveHistory().remove(board.getMoveHistory().size() - 1);</span>
+
+<span class="fc" id="L110">        moveActor(board, record.getPlayerTo(), record.getPlayerFrom());</span>
+<span class="fc" id="L111">        board.setPlayerPosition(record.getPlayerFrom());</span>
+
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">        if (record.getBoxFrom() != null &amp;&amp; record.getBoxTo() != null) {</span>
+<span class="fc" id="L114">            moveActor(board, record.getBoxTo(), record.getBoxFrom());</span>
+        }
+
+<span class="fc" id="L117">        refreshMoveRecordFlags(board, record);</span>
+
+<span class="fc" id="L119">        LOGGER.debug(&quot;Undo restored player from {} to {}&quot;, record.getPlayerTo(), record.getPlayerFrom());</span>
+<span class="fc" id="L120">        return true;</span>
+    }
+
+    @Override
+    public boolean isSolved(Board board) {
+<span class="fc" id="L125">        requireBoard(board);</span>
+<span class="fc" id="L126">        int goalCount = countGoals(board);</span>
+<span class="fc bfc" id="L127" title="All 4 branches covered.">        if (goalCount == 0 || !allGoalsContainBoxes(board)) {</span>
+<span class="fc" id="L128">            return false;</span>
+        }
+
+<span class="fc" id="L131">        int boxCount = countBoxesOnGoals(board);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        return goalCount == boxCount;</span>
+    }
+
+    @Override
+    public Pair findPlayer(Board board) {
+<span class="fc" id="L137">        requireBoard(board);</span>
+<span class="fc" id="L138">        return board.getPlayerPosition();</span>
+    }
+
+    @Override
+    public String render(Board board) {
+<span class="fc" id="L143">        requireBoard(board);</span>
+<span class="fc" id="L144">        int rows = board.getRows();</span>
+<span class="fc" id="L145">        int columns = board.getColumns();</span>
+<span class="fc bfc" id="L146" title="All 4 branches covered.">        if (rows == 0 || columns == 0) {</span>
+<span class="fc" id="L147">            return &quot;&quot;;</span>
+        }
+
+<span class="fc" id="L150">        StringBuilder sb = new StringBuilder(rows * (columns + 1));</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        for (int y = 0; y &lt; rows; y++) {</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">            for (int x = 0; x &lt; columns; x++) {</span>
+<span class="fc" id="L153">                appendRenderedCell(sb, board, new Pair(x, y));</span>
+            }
+<span class="fc" id="L155">            sb.append(&quot;\n&quot;);</span>
+        }
+
+<span class="fc" id="L158">        return sb.toString();</span>
+    }
+
+    private IObject getObjectAt(Board board, Pair position) {
+<span class="fc" id="L162">        IObject actor = board.getActors().get(position);</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        return actor != null ? actor : board.getTerrain().get(position);</span>
+    }
+
+    private boolean movePlayer(Board board, Pair from, Pair to) {
+<span class="fc" id="L167">        moveActor(board, from, to);</span>
+<span class="fc" id="L168">        board.setPlayerPosition(to);</span>
+<span class="fc" id="L169">        updateActorGoalFlag(board, to);</span>
+<span class="fc" id="L170">        updateActorGoalFlag(board, from);</span>
+<span class="fc" id="L171">        board.getMoveHistory().add(new Board.MoveRecord(from, to, null, null));</span>
+<span class="fc" id="L172">        LOGGER.debug(&quot;Player moved from {} to {}&quot;, from, to);</span>
+<span class="fc" id="L173">        return true;</span>
+    }
+
+    private boolean pushBox(Board board, Pair playerFrom, Pair boxFrom, Pair direction) {
+<span class="fc" id="L177">        Pair boxTo = pairService.add(boxFrom, direction);</span>
+<span class="fc bfc" id="L178" title="All 4 branches covered.">        if (!canEnter(board, boxTo) || board.getActors().containsKey(boxTo)) {</span>
+<span class="fc" id="L179">            return false;</span>
+        }
+
+<span class="fc" id="L182">        moveActor(board, boxFrom, boxTo);</span>
+<span class="fc" id="L183">        updateActorGoalFlag(board, boxTo);</span>
+<span class="fc" id="L184">        updateActorGoalFlag(board, boxFrom);</span>
+
+<span class="fc" id="L186">        moveActor(board, playerFrom, boxFrom);</span>
+<span class="fc" id="L187">        board.setPlayerPosition(boxFrom);</span>
+<span class="fc" id="L188">        updateActorGoalFlag(board, boxFrom);</span>
+<span class="fc" id="L189">        updateActorGoalFlag(board, playerFrom);</span>
+
+<span class="fc" id="L191">        board.getMoveHistory().add(new Board.MoveRecord(playerFrom, boxFrom, boxFrom, boxTo));</span>
+<span class="fc" id="L192">        LOGGER.debug(&quot;Player moved from {} to {} and pushed box to {}&quot;, playerFrom, boxFrom, boxTo);</span>
+<span class="fc" id="L193">        return true;</span>
+    }
+
+    private void refreshMoveRecordFlags(Board board, Board.MoveRecord record) {
+<span class="fc" id="L197">        updateActorGoalFlag(board, record.getPlayerFrom());</span>
+<span class="fc" id="L198">        updateActorGoalFlag(board, record.getPlayerTo());</span>
+<span class="pc bpc" id="L199" title="1 of 4 branches missed.">        if (record.getBoxFrom() != null &amp;&amp; record.getBoxTo() != null) {</span>
+<span class="fc" id="L200">            updateActorGoalFlag(board, record.getBoxFrom());</span>
+<span class="fc" id="L201">            updateActorGoalFlag(board, record.getBoxTo());</span>
+        }
+<span class="fc" id="L203">    }</span>
+
+    private int countGoals(Board board) {
+<span class="fc" id="L206">        int goalCount = 0;</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        for (IObject terrain : board.getTerrain().values()) {</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">            if (terrain.type() == Type.GOALPOSITION) {</span>
+<span class="fc" id="L209">                goalCount++;</span>
+            }
+<span class="fc" id="L211">        }</span>
+<span class="fc" id="L212">        return goalCount;</span>
+    }
+
+    private boolean allGoalsContainBoxes(Board board) {
+<span class="fc bfc" id="L216" title="All 2 branches covered.">        for (Map.Entry&lt;Pair, IObject&gt; entry : board.getTerrain().entrySet()) {</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">            if (entry.getValue().type() != Type.GOALPOSITION) {</span>
+<span class="fc" id="L218">                continue;</span>
+            }
+
+<span class="fc" id="L221">            IObject actor = board.getActors().get(entry.getKey());</span>
+<span class="fc bfc" id="L222" title="All 4 branches covered.">            if (actor == null || actor.type() != Type.BOX) {</span>
+<span class="fc" id="L223">                return false;</span>
+            }
+<span class="fc" id="L225">        }</span>
+<span class="fc" id="L226">        return true;</span>
+    }
+
+    private int countBoxesOnGoals(Board board) {
+<span class="fc" id="L230">        int boxCount = 0;</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">        for (Map.Entry&lt;Pair, IObject&gt; entry : board.getActors().entrySet()) {</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">            if (entry.getValue().type() != Type.BOX) {</span>
+<span class="fc" id="L233">                continue;</span>
+            }
+<span class="fc bfc" id="L235" title="All 2 branches covered.">            if (!isGoal(board, entry.getKey())) {</span>
+<span class="fc" id="L236">                return -1;</span>
+            }
+<span class="fc" id="L238">            boxCount++;</span>
+<span class="fc" id="L239">        }</span>
+<span class="fc" id="L240">        return boxCount;</span>
+    }
+
+    private void appendRenderedCell(StringBuilder builder, Board board, Pair position) {
+<span class="fc" id="L244">        IObject cell = getObjectAt(board, position);</span>
+<span class="fc bfc" id="L245" title="All 2 branches covered.">        builder.append(cell != null ? cell.toString() : &quot; &quot;);</span>
+<span class="fc" id="L246">    }</span>
+
+    private void moveActor(Board board, Pair from, Pair to) {
+<span class="fc" id="L249">        IObject obj = board.getActors().remove(from);</span>
+<span class="fc bfc" id="L250" title="All 2 branches covered.">        if (obj != null) {</span>
+<span class="fc" id="L251">            board.getActors().put(to, obj);</span>
+        }
+<span class="fc" id="L253">    }</span>
+
+    private boolean canEnter(Board board, Pair position) {
+<span class="fc bfc" id="L256" title="All 4 branches covered.">        return isInside(board, position) &amp;&amp; !isWall(board, position);</span>
+    }
+
+    private boolean isWall(Board board, Pair position) {
+<span class="fc" id="L260">        IObject tile = board.getTerrain().get(position);</span>
+<span class="fc bfc" id="L261" title="All 4 branches covered.">        return tile != null &amp;&amp; tile.type() == Type.WALL;</span>
+    }
+
+    private boolean isGoal(Board board, Pair position) {
+<span class="fc" id="L265">        IObject tile = board.getTerrain().get(position);</span>
+<span class="pc bpc" id="L266" title="1 of 4 branches missed.">        return tile != null &amp;&amp; tile.type() == Type.GOALPOSITION;</span>
+    }
+
+    private void updateActorGoalFlag(Board board, Pair position) {
+<span class="fc" id="L270">        IObject actor = board.getActors().get(position);</span>
+<span class="fc bfc" id="L271" title="All 2 branches covered.">        if (actor == null) {</span>
+<span class="fc" id="L272">            return;</span>
+        }
+<span class="fc bfc" id="L274" title="All 4 branches covered.">        if (actor.type() != Type.PLAYER &amp;&amp; actor.type() != Type.BOX) {</span>
+<span class="fc" id="L275">            return;</span>
+        }
+<span class="fc" id="L277">        actor.setOnGoalPos(isGoal(board, position));</span>
+<span class="fc" id="L278">    }</span>
+
+    private boolean isInside(Board board, Pair position) {
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        if (position == null) {</span>
+<span class="fc" id="L282">            return false;</span>
+        }
+<span class="fc bfc" id="L284" title="All 4 branches covered.">        return position.x() &gt;= 0 &amp;&amp; position.x() &lt; board.getColumns()</span>
+<span class="fc bfc" id="L285" title="All 4 branches covered.">                &amp;&amp; position.y() &gt;= 0 &amp;&amp; position.y() &lt; board.getRows();</span>
+    }
+
+    private void requireInside(Board board, Pair position) {
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        if (!isInside(board, position)) {</span>
+<span class="fc" id="L290">            throw new IllegalArgumentException(OUTSIDE_BOARD_MESSAGE);</span>
+        }
+<span class="fc" id="L292">    }</span>
+
+    private void requireBoard(Board board) {
+<span class="fc" id="L295">        Objects.requireNonNull(board, &quot;board must not be null&quot;);</span>
+<span class="fc" id="L296">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

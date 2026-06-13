@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LevelParserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sokoban</a> &gt; <a href="index.source.html" class="el_package">es.upm.pproject.sokoban.model.services.implementations</a> &gt; <span class="el_source">LevelParserServiceImpl.java</span></div><h1>LevelParserServiceImpl.java</h1><pre class="source lang-java linenums">package es.upm.pproject.sokoban.model.services.implementations;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import es.upm.pproject.sokoban.model.dto.Pair;
+import es.upm.pproject.sokoban.model.dto.Board;
+import es.upm.pproject.sokoban.model.dto.Box;
+import es.upm.pproject.sokoban.model.dto.GoalPosition;
+import es.upm.pproject.sokoban.model.dto.Player;
+import es.upm.pproject.sokoban.model.dto.Wall;
+import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
+import es.upm.pproject.sokoban.model.services.interfaces.LevelParserService;
+
+<span class="fc" id="L21">class LevelParserServiceImpl implements LevelParserService {</span>
+<span class="fc" id="L22">    private static final Logger LOGGER = LoggerFactory.getLogger(LevelParserServiceImpl.class);</span>
+    private static final char WALL = '+';
+    private static final char GOAL = '*';
+    private static final char BOX = '#';
+    private static final char PLAYER = 'W';
+    private static final char EMPTY = ' ';
+
+    @Override
+    public Board parseResource(String fileName, BoardService boardService) {
+<span class="pc bpc" id="L31" title="2 of 4 branches missed.">        if (fileName == null || fileName.trim().isEmpty()) {</span>
+<span class="nc" id="L32">            throw new IllegalArgumentException(&quot;Level file name cannot be empty&quot;);</span>
+        }
+
+<span class="fc" id="L35">        InputStream stream = LevelParserServiceImpl.class.getClassLoader().getResourceAsStream(fileName);</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (stream == null) {</span>
+<span class="fc" id="L37">            throw new IllegalArgumentException(&quot;Level file not found: &quot; + fileName);</span>
+        }
+
+<span class="fc" id="L40">        return parse(stream, fileName, boardService);</span>
+    }
+
+    @Override
+    public Board parse(InputStream stream, String sourceName, BoardService boardService) {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (stream == null) {</span>
+<span class="nc" id="L46">            throw new IllegalArgumentException(&quot;Level input cannot be null&quot;);</span>
+        }
+
+<span class="pc bpc" id="L49" title="2 of 4 branches missed.">        String levelSource = sourceName == null || sourceName.trim().isEmpty() ? &quot;level input&quot; : sourceName;</span>
+<span class="fc" id="L50">        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {</span>
+<span class="fc" id="L51">            return parse(reader, levelSource, boardService);</span>
+<span class="nc" id="L52">        } catch (IOException exception) {</span>
+<span class="nc" id="L53">            throw new IllegalStateException(&quot;Could not read level file: &quot; + levelSource, exception);</span>
+        }
+    }
+
+    private Board parse(BufferedReader reader, String sourceName, BoardService boardService) throws IOException {
+<span class="fc" id="L58">        String levelName = reader.readLine();</span>
+<span class="fc" id="L59">        String dimensions = reader.readLine();</span>
+<span class="pc bpc" id="L60" title="1 of 4 branches missed.">        if (levelName == null || dimensions == null) {</span>
+<span class="fc" id="L61">            throw new IllegalArgumentException(&quot;Level file is incomplete: &quot; + sourceName);</span>
+        }
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if (levelName.trim().isEmpty()) {</span>
+<span class="nc" id="L64">            throw new IllegalArgumentException(&quot;Level name cannot be empty: &quot; + sourceName);</span>
+        }
+
+<span class="fc" id="L67">        int[] boardDimensions = parseDimensions(dimensions, sourceName);</span>
+<span class="fc" id="L68">        int rows = boardDimensions[0];</span>
+<span class="fc" id="L69">        int columns = boardDimensions[1];</span>
+<span class="fc" id="L70">        Board board = new Board(levelName, rows, columns);</span>
+<span class="fc" id="L71">        LevelCounts counts = new LevelCounts();</span>
+
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for (int row = 0; row &lt; rows; row++) {</span>
+<span class="fc" id="L74">            String line = reader.readLine();</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">            if (line == null) {</span>
+<span class="nc" id="L76">                throw new IllegalArgumentException(&quot;Level has fewer rows than expected: &quot; + sourceName);</span>
+            }
+<span class="fc" id="L78">            validateRowLength(line, columns, sourceName, row);</span>
+<span class="fc" id="L79">            parseRow(board, line, sourceName, row, counts, boardService);</span>
+        }
+
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (reader.readLine() != null) {</span>
+<span class="fc" id="L83">            throw new IllegalArgumentException(&quot;Level has more rows than expected: &quot; + sourceName);</span>
+        }
+
+<span class="fc" id="L86">        validateObjectCounts(sourceName, counts);</span>
+<span class="fc" id="L87">        LOGGER.info(</span>
+            &quot;Parsed level {} with size {}x{} (players={}, boxes={}, goals={})&quot;,
+            levelName,
+<span class="fc" id="L90">            rows,</span>
+<span class="fc" id="L91">            columns,</span>
+<span class="fc" id="L92">            counts.players,</span>
+<span class="fc" id="L93">            counts.boxes,</span>
+<span class="fc" id="L94">            counts.goals</span>
+        );
+<span class="fc" id="L96">        return board;</span>
+    }
+
+    private int[] parseDimensions(String dimensions, String sourceName) {
+<span class="fc" id="L100">        String[] dimensionParts = dimensions.trim().split(&quot;\\s+&quot;);</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if (dimensionParts.length != 2) {</span>
+<span class="nc" id="L102">            throw new IllegalArgumentException(&quot;Invalid dimensions in &quot; + sourceName);</span>
+        }
+
+        try {
+<span class="fc" id="L106">            int rows = Integer.parseInt(dimensionParts[0]);</span>
+<span class="fc" id="L107">            int columns = Integer.parseInt(dimensionParts[1]);</span>
+<span class="pc bpc" id="L108" title="1 of 4 branches missed.">            if (rows &lt;= 0 || columns &lt;= 0) {</span>
+<span class="fc" id="L109">                throw new IllegalArgumentException(&quot;Level dimensions must be positive in &quot; + sourceName);</span>
+            }
+<span class="fc" id="L111">            return new int[] { rows, columns };</span>
+<span class="fc" id="L112">        } catch (NumberFormatException exception) {</span>
+<span class="fc" id="L113">            throw new IllegalArgumentException(&quot;Invalid dimensions in &quot; + sourceName, exception);</span>
+        }
+    }
+
+    private void validateRowLength(String line, int columns, String sourceName, int row) {
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (line.length() != columns) {</span>
+<span class="fc" id="L119">            throw new IllegalArgumentException(</span>
+                &quot;Invalid row length in &quot; + sourceName + &quot; at row &quot; + (row + 1)
+            );
+        }
+<span class="fc" id="L123">    }</span>
+
+    private void parseRow(Board board, String line, String sourceName, int row, LevelCounts counts, BoardService boardService) {
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        for (int column = 0; column &lt; line.length(); column++) {</span>
+<span class="fc" id="L127">            Pair position = new Pair(column, row);</span>
+<span class="fc" id="L128">            char tile = line.charAt(column);</span>
+<span class="fc bfc" id="L129" title="All 6 branches covered.">            switch (tile) {</span>
+                case WALL:
+<span class="fc" id="L131">                    boardService.addTerrain(board, position, new Wall());</span>
+<span class="fc" id="L132">                    break;</span>
+                case GOAL:
+<span class="fc" id="L134">                    counts.goals++;</span>
+<span class="fc" id="L135">                    boardService.addTerrain(board, position, new GoalPosition());</span>
+<span class="fc" id="L136">                    break;</span>
+                case BOX:
+<span class="fc" id="L138">                    counts.boxes++;</span>
+<span class="fc" id="L139">                    boardService.addActor(board, position, new Box());</span>
+<span class="fc" id="L140">                    break;</span>
+                case PLAYER:
+<span class="fc" id="L142">                    counts.players++;</span>
+<span class="fc" id="L143">                    boardService.addActor(board, position, new Player());</span>
+<span class="fc" id="L144">                    break;</span>
+                case EMPTY:
+<span class="fc" id="L146">                    break;</span>
+                default:
+<span class="fc" id="L148">                    throw new IllegalArgumentException(</span>
+                        &quot;Invalid character in &quot; + sourceName + &quot; at row &quot; + (row + 1)
+                            + &quot;, column &quot; + (column + 1)
+                    );
+            }
+        }
+<span class="fc" id="L154">    }</span>
+
+    private void validateObjectCounts(String sourceName, LevelCounts counts) {
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        if (counts.players != 1) {</span>
+<span class="fc" id="L158">            throw new IllegalArgumentException(sourceName + &quot; must have exactly one warehouse man&quot;);</span>
+        }
+<span class="pc bpc" id="L160" title="1 of 4 branches missed.">        if (counts.boxes &lt; 1 || counts.goals &lt; 1) {</span>
+<span class="fc" id="L161">            throw new IllegalArgumentException(sourceName + &quot; must have at least one box and one goal&quot;);</span>
+        }
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">        if (counts.boxes != counts.goals) {</span>
+<span class="nc" id="L164">            throw new IllegalArgumentException(sourceName + &quot; must have the same number of boxes and goals&quot;);</span>
+        }
+<span class="fc" id="L166">    }</span>
+
+    private static final class LevelCounts {
+        private int boxes;
+        private int goals;
+        private int players;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

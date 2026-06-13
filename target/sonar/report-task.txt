@@ -1,0 +1,6 @@
+projectKey=Sokoban-Proyect
+serverUrl=https://costa.ls.fi.upm.es/sonar
+serverVersion=9.6.1.59531
+dashboardUrl=https://costa.ls.fi.upm.es/sonar/dashboard?id=Sokoban-Proyect
+ceTaskId=AZ7Bnsh1CsdDL3RcGqWw
+ceTaskUrl=https://costa.ls.fi.upm.es/sonar/api/ce/task?id=AZ7Bnsh1CsdDL3RcGqWw

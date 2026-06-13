@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameView.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sokoban</a> &gt; <a href="index.source.html" class="el_package">es.upm.pproject.sokoban.view</a> &gt; <span class="el_source">GameView.java</span></div><h1>GameView.java</h1><pre class="source lang-java linenums">package es.upm.pproject.sokoban.view;
+
+import java.io.PrintStream;
+import es.upm.pproject.sokoban.controller.GameController;
+
+public class GameView {
+    private static final String CLEAR_SCREEN = &quot;\033[2J\033[H&quot;;
+    private static final String HIDE_CURSOR = &quot;\033[?25l&quot;;
+    private static final String SHOW_CURSOR = &quot;\033[?25h&quot;;
+
+    private final GameController controller;
+    private final PrintStream out;
+
+<span class="fc" id="L14">    public GameView(GameController controller, PrintStream out) {</span>
+<span class="fc" id="L15">        this.controller = controller;</span>
+<span class="fc" id="L16">        this.out = out;</span>
+<span class="fc" id="L17">    }</span>
+
+    public void render() {
+<span class="fc" id="L20">        out.print(CLEAR_SCREEN);</span>
+<span class="fc" id="L21">        String renderedBoard = controller.getBoardService().render(controller.getBoard());</span>
+<span class="fc" id="L22">        out.print(renderedBoard);</span>
+<span class="fc" id="L23">        out.println(&quot;Level: &quot; + controller.getLevelNumber() + &quot; - &quot; + controller.getLevelName());</span>
+<span class="fc" id="L24">        out.println(&quot;Level score: &quot; + controller.getLevelScore());</span>
+<span class="fc" id="L25">        out.println(&quot;Global score: &quot; + controller.getGlobalScore());</span>
+<span class="fc" id="L26">    }</span>
+
+    public void displayMessage(String message) {
+<span class="nc" id="L29">        out.println(message);</span>
+<span class="nc" id="L30">    }</span>
+
+    public void hideCursor() {
+<span class="nc" id="L33">        out.print(HIDE_CURSOR);</span>
+<span class="nc" id="L34">    }</span>
+
+    public void showCursor() {
+<span class="nc" id="L37">        out.print(SHOW_CURSOR);</span>
+<span class="nc" id="L38">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
