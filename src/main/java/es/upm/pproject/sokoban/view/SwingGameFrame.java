@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -298,8 +299,8 @@ public class SwingGameFrame extends JFrame {
 
     private void closeApplication() {
         LOGGER.info("Closing application");
-        dispose();
-        System.exit(0);
+        cancelPendingLevelAdvance();
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
 
     private void scheduleNextLevel() {

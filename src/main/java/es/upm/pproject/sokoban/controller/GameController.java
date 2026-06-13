@@ -40,7 +40,7 @@ public class GameController {
         this.levelScore = INITIAL_SCORE;
         this.globalScore = INITIAL_SCORE;
         this.currentLevelScoreRecorded = false;
-        this.board = loadLevel(levelNumber);
+        this.board = loadLevelInternal(levelNumber);
         LOGGER.info("Game controller initialized at level {}", levelNumber);
     }
 
@@ -69,7 +69,7 @@ public class GameController {
 
     public void restartLevel() {
         clearCurrentLevelScoreRecord();
-        this.board = loadLevel(levelNumber);
+        this.board = loadLevelInternal(levelNumber);
         this.levelScore = INITIAL_SCORE;
         LOGGER.info("Level {} restarted", levelNumber);
     }
@@ -79,7 +79,7 @@ public class GameController {
         this.levelScore = INITIAL_SCORE;
         this.globalScore = INITIAL_SCORE;
         this.currentLevelScoreRecorded = false;
-        this.board = loadLevel(levelNumber);
+        this.board = loadLevelInternal(levelNumber);
         LOGGER.info("New game started");
     }
 
@@ -87,7 +87,7 @@ public class GameController {
         recordCurrentLevelScoreIfSolved();
         int nextLevelNumber = levelNumber + 1;
         try {
-            Board nextBoard = loadLevel(nextLevelNumber);
+            Board nextBoard = loadLevelInternal(nextLevelNumber);
             this.levelNumber = nextLevelNumber;
             this.board = nextBoard;
             this.levelScore = INITIAL_SCORE;
@@ -169,6 +169,10 @@ public class GameController {
     }
 
     public Board loadLevel(int level) {
+        return loadLevelInternal(level);
+    }
+
+    private Board loadLevelInternal(int level) {
         String fileName = "level " + level + ".txt";
         LOGGER.info("Loading level resource {}", fileName);
         Board loadedBoard = levelParserService.parseResource(fileName, boardService);
@@ -249,18 +253,20 @@ public class GameController {
     }
 
     private void restore(SaveGameState state) throws IOException {
-        if (state.board == null) {
+        if (state.getBoard() == null) {
             throw new IOException("Saved game does not contain a board");
         }
-        if (state.levelNumber < INITIAL_LEVEL || state.levelScore < INITIAL_SCORE || state.globalScore < INITIAL_SCORE) {
+        if (state.getLevelNumber() < INITIAL_LEVEL
+                || state.getLevelScore() < INITIAL_SCORE
+                || state.getGlobalScore() < INITIAL_SCORE) {
             throw new IOException("Saved game contains invalid score or level values");
         }
 
-        this.levelNumber = state.levelNumber;
-        this.board = state.board;
-        this.levelScore = state.levelScore;
-        this.globalScore = state.globalScore;
-        this.currentLevelScoreRecorded = state.currentLevelScoreRecorded;
+        this.levelNumber = state.getLevelNumber();
+        this.board = state.getBoard();
+        this.levelScore = state.getLevelScore();
+        this.globalScore = state.getGlobalScore();
+        this.currentLevelScoreRecorded = state.isCurrentLevelScoreRecorded();
         LOGGER.info("Restored game state at level {} with score {}", levelNumber, levelScore);
     }
 
@@ -285,6 +291,26 @@ public class GameController {
             this.levelScore = levelScore;
             this.globalScore = globalScore;
             this.currentLevelScoreRecorded = currentLevelScoreRecorded;
+        }
+
+        private int getLevelNumber() {
+            return levelNumber;
+        }
+
+        private Board getBoard() {
+            return board;
+        }
+
+        private int getLevelScore() {
+            return levelScore;
+        }
+
+        private int getGlobalScore() {
+            return globalScore;
+        }
+
+        private boolean isCurrentLevelScoreRecorded() {
+            return currentLevelScoreRecorded;
         }
     }
 }
