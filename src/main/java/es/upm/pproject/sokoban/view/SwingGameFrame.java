@@ -244,6 +244,10 @@ public class SwingGameFrame extends JFrame {
         }
 
         File selectedFile = ensureSaveExtension(fileChooser.getSelectedFile());
+        if (selectedFile == null) {
+            showError("Could not save the game", new IllegalArgumentException("No save file was selected"));
+            return;
+        }
         try {
             controller.saveGame(selectedFile.toPath());
             LOGGER.info("Save requested from UI: {}", selectedFile);

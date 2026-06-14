@@ -79,7 +79,8 @@ class LevelParserServiceImpl implements LevelParserService {
             parseRow(board, line, sourceName, row, counts, boardService);
         }
 
-        if (reader.readLine() != null) {
+        String trailingLine = reader.readLine();
+        if (trailingLine != null) {
             throw new IllegalArgumentException("Level has more rows than expected: " + sourceName);
         }
 
