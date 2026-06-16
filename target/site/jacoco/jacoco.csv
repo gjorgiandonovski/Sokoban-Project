@@ -1,0 +1,23 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Sokoban,es.upm.pproject.sokoban.model.services.implementations,LevelParserServiceImpl,0,384,0,48,0,81,0,35,0,9
+Sokoban,es.upm.pproject.sokoban.model.services.implementations,ServiceFactory,0,15,0,0,0,4,0,4,0,4
+Sokoban,es.upm.pproject.sokoban.model.services.implementations,LevelParserServiceImpl.LevelCounts,0,30,0,0,0,9,0,6,0,6
+Sokoban,es.upm.pproject.sokoban.model.services.implementations,PairServiceImpl,0,42,0,8,0,8,0,7,0,3
+Sokoban,es.upm.pproject.sokoban.model.services.implementations,BoardServiceImpl,0,726,0,114,0,160,0,83,0,26
+Sokoban,es.upm.pproject.sokoban.model.services.implementations,LevelParserServiceImpl.BoardDimensions,0,15,0,0,0,6,0,3,0,3
+Sokoban,es.upm.pproject.sokoban,App,136,0,14,0,37,0,13,0,6,0
+Sokoban,es.upm.pproject.sokoban.controller,GameController,226,417,40,27,48,109,40,28,11,22
+Sokoban,es.upm.pproject.sokoban.controller,GameController.SaveGameState,0,33,0,0,0,12,0,6,0,6
+Sokoban,es.upm.pproject.sokoban.controller,GameController.LevelLoadResult,0,15,0,0,0,6,0,3,0,3
+Sokoban,es.upm.pproject.sokoban.model.dto,Type,0,27,0,0,0,2,0,1,0,1
+Sokoban,es.upm.pproject.sokoban.model.dto,Board.MoveRecord,0,27,0,0,0,10,0,5,0,5
+Sokoban,es.upm.pproject.sokoban.model.dto,Player,0,17,0,0,0,8,0,5,0,5
+Sokoban,es.upm.pproject.sokoban.model.dto,Box,0,17,0,0,0,8,0,5,0,5
+Sokoban,es.upm.pproject.sokoban.model.dto,Pair,0,67,0,10,0,13,0,11,0,6
+Sokoban,es.upm.pproject.sokoban.model.dto,GoalPosition,0,10,0,0,0,5,0,5,0,5
+Sokoban,es.upm.pproject.sokoban.model.dto,Wall,0,10,0,0,0,5,0,5,0,5
+Sokoban,es.upm.pproject.sokoban.model.dto,Board,0,76,0,8,0,20,0,14,0,10
+Sokoban,es.upm.pproject.sokoban.view,SwingGameFrame.new AbstractAction() {...},13,0,0,0,3,0,2,0,2,0
+Sokoban,es.upm.pproject.sokoban.view,SwingGameFrame.BoardPanel,795,0,28,0,118,0,25,0,11,0
+Sokoban,es.upm.pproject.sokoban.view,GameView,15,50,0,0,6,11,3,2,3,2
+Sokoban,es.upm.pproject.sokoban.view,SwingGameFrame,914,0,34,0,199,0,54,0,37,0

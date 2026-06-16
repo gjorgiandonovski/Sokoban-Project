@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -35,12 +36,16 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import es.upm.pproject.sokoban.controller.GameController;
 import es.upm.pproject.sokoban.model.dto.IObject;
 import es.upm.pproject.sokoban.model.dto.Pair;
 
 public class SwingGameFrame extends JFrame {
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SwingGameFrame.class);
 
     private static final Pair UP = new Pair(0, -1);
     private static final Pair DOWN = new Pair(0, 1);
@@ -81,6 +86,7 @@ public class SwingGameFrame extends JFrame {
         refresh("Ready");
         pack();
         setLocationRelativeTo(null);
+        LOGGER.info("Swing game frame initialized");
     }
 
     private JMenuBar createMenuBar() {
@@ -218,6 +224,7 @@ public class SwingGameFrame extends JFrame {
         controller.startNewGame();
         gameCompleted = false;
         advancingLevel = false;
+        LOGGER.info("New game requested from UI");
         refresh("New game started");
     }
 
@@ -226,6 +233,7 @@ public class SwingGameFrame extends JFrame {
         controller.restartLevel();
         gameCompleted = false;
         advancingLevel = false;
+        LOGGER.info("Restart requested from UI for level {}", controller.getLevelNumber());
         refresh("Level restarted");
     }
 
@@ -236,8 +244,13 @@ public class SwingGameFrame extends JFrame {
         }
 
         File selectedFile = ensureSaveExtension(fileChooser.getSelectedFile());
+        if (selectedFile == null) {
+            showError("Could not save the game", new IllegalArgumentException("No save file was selected"));
+            return;
+        }
         try {
             controller.saveGame(selectedFile.toPath());
+            LOGGER.info("Save requested from UI: {}", selectedFile);
             refresh("Game saved");
         } catch (IOException | RuntimeException exception) {
             showError("Could not save the game", exception);
@@ -255,6 +268,7 @@ public class SwingGameFrame extends JFrame {
             controller.loadGame(fileChooser.getSelectedFile().toPath());
             gameCompleted = false;
             advancingLevel = false;
+            LOGGER.info("Load requested from UI");
             refresh("Game loaded");
             if (controller.isSolved()) {
                 scheduleNextLevel();
@@ -278,6 +292,7 @@ public class SwingGameFrame extends JFrame {
     }
 
     private void showError(String message, Exception exception) {
+        LOGGER.error(message, exception);
         JOptionPane.showMessageDialog(
             this,
             message + ":\n" + exception.getMessage(),
@@ -287,13 +302,15 @@ public class SwingGameFrame extends JFrame {
     }
 
     private void closeApplication() {
-        dispose();
-        System.exit(0);
+        LOGGER.info("Closing application");
+        cancelPendingLevelAdvance();
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
 
     private void scheduleNextLevel() {
         cancelPendingLevelAdvance();
         advancingLevel = true;
+        LOGGER.info("Scheduling next level transition");
         levelAdvanceTimer = new Timer(700, event -> advanceLevel());
         levelAdvanceTimer.setRepeats(false);
         levelAdvanceTimer.start();
@@ -303,9 +320,11 @@ public class SwingGameFrame extends JFrame {
         advancingLevel = false;
         levelAdvanceTimer = null;
         if (controller.nextLevel()) {
+            LOGGER.info("Next level shown in UI: {}", controller.getLevelNumber());
             refresh("Next level loaded");
         } else {
             gameCompleted = true;
+            LOGGER.info("Game completed in UI with total score {}", controller.getGlobalScore());
             refresh("You won! Total score: " + controller.getGlobalScore());
             showGameCompletedDialog();
         }

@@ -3,9 +3,12 @@ package es.upm.pproject.sokoban;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
@@ -22,6 +25,8 @@ import es.upm.pproject.sokoban.model.dto.Type;
 import es.upm.pproject.sokoban.model.dto.Wall;
 import es.upm.pproject.sokoban.model.services.implementations.ServiceFactory;
 import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
+import es.upm.pproject.sokoban.model.services.interfaces.LevelParserService;
+import es.upm.pproject.sokoban.model.services.interfaces.PairService;
 import es.upm.pproject.sokoban.view.GameView;
 
 public class AppTest {
@@ -91,8 +96,18 @@ public class AppTest {
 
         loadedController.undoMove();
 
-        assertEquals(0, loadedController.getLevelScore());
+        assertEquals(1, loadedController.getLevelScore());
         assertEquals(initialRender, loadedController.getBoardService().render(loadedController.getBoard()));
+    }
+
+    @Test
+    public void undoDoesNotReduceLevelScore() {
+        GameController controller = new GameController();
+
+        controller.movePlayer(new Pair(1, 0));
+        controller.undoMove();
+
+        assertEquals(1, controller.getLevelScore());
     }
 
     @Test
@@ -153,6 +168,34 @@ public class AppTest {
     }
 
     @Test
+    public void controllerStartsAtFirstValidLevelWhenEarlierLevelIsInvalid() {
+        PairService pairService = ServiceFactory.createPairService();
+        LevelParserService parser = parserWithSequence(
+                invalidLevel("level 1.txt", "level 1.txt must have exactly one warehouse man"),
+                validLevel("level 2.txt", board("Recovered level")));
+
+        GameController controller = new GameController(boardService, pairService, parser);
+
+        assertEquals(2, controller.getLevelNumber());
+        assertEquals("Recovered level", controller.getLevelName());
+    }
+
+    @Test
+    public void nextLevelSkipsInvalidLevelFiles() {
+        PairService pairService = ServiceFactory.createPairService();
+        LevelParserService parser = parserWithSequence(
+                validLevel("level 1.txt", board("Initial test level")),
+                invalidLevel("level 2.txt", "Invalid dimensions in level 2.txt"),
+                validLevel("level 3.txt", board("Recovered next level")));
+
+        GameController controller = new GameController(boardService, pairService, parser);
+
+        assertTrue(controller.nextLevel());
+        assertEquals(3, controller.getLevelNumber());
+        assertEquals("Recovered next level", controller.getLevelName());
+    }
+
+    @Test
     public void playerMovesHorizontallyAndVertically() {
         Board board = new Board(3, 3);
         boardService.addActor(board, new Pair(1, 1), new Player());
@@ -190,6 +233,105 @@ public class AppTest {
 
         assertFalse(boardService.tryMovePlayer(board, new Pair(-1, 0)));
         assertFalse(boardService.tryMovePlayer(board, new Pair(0, -1)));
+        assertEquals(new Pair(0, 0), boardService.findPlayer(board));
+    }
+
+    @Test
+    public void getReturnsNullOutsideBoard() {
+        Board board = new Board(2, 2);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+
+        assertNull(boardService.get(board, -1, 0));
+        assertNull(boardService.get(board, 2, 0));
+        assertNull(boardService.get(board, 0, -1));
+        assertNull(boardService.get(board, 0, 2));
+    }
+
+    @Test
+    public void addTerrainIgnoresNullObjects() {
+        Board board = new Board(2, 2);
+
+        boardService.addTerrain(board, new Pair(1, 1), null);
+
+        assertTrue(board.getTerrain().isEmpty());
+    }
+
+    @Test
+    public void addTerrainRejectsActorObjects() {
+        Board board = new Board(2, 2);
+
+        assertThrows(IllegalArgumentException.class, () -> boardService.addTerrain(board, new Pair(1, 1), new Player()));
+    }
+
+    @Test
+    public void addTerrainRejectsNullPosition() {
+        Board board = new Board(2, 2);
+
+        assertThrows(IllegalArgumentException.class, () -> boardService.addTerrain(board, null, new Wall()));
+    }
+
+    @Test
+    public void addTerrainRejectsOutsideBoardPosition() {
+        Board board = new Board(2, 2);
+
+        assertThrows(IllegalArgumentException.class, () -> boardService.addTerrain(board, new Pair(2, 0), new Wall()));
+    }
+
+    @Test
+    public void addActorIgnoresNullObjects() {
+        Board board = new Board(2, 2);
+
+        boardService.addActor(board, new Pair(1, 1), null);
+
+        assertTrue(board.getActors().isEmpty());
+        assertNull(board.getPlayerPosition());
+    }
+
+    @Test
+    public void addActorRejectsTerrainObjects() {
+        Board board = new Board(2, 2);
+
+        assertThrows(IllegalArgumentException.class, () -> boardService.addActor(board, new Pair(1, 1), new Wall()));
+    }
+
+    @Test
+    public void addActorRejectsWalls() {
+        Board board = new Board(2, 2);
+        boardService.addTerrain(board, new Pair(1, 1), new Wall());
+
+        assertThrows(IllegalArgumentException.class, () -> boardService.addActor(board, new Pair(1, 1), new Player()));
+    }
+
+    @Test
+    public void addActorRejectsOccupiedSquares() {
+        Board board = new Board(2, 2);
+        boardService.addActor(board, new Pair(1, 1), new Box());
+
+        assertThrows(IllegalArgumentException.class, () -> boardService.addActor(board, new Pair(1, 1), new Player()));
+    }
+
+    @Test
+    public void addActorRejectsSecondPlayer() {
+        Board board = new Board(2, 2);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+
+        assertThrows(IllegalArgumentException.class, () -> boardService.addActor(board, new Pair(1, 1), new Player()));
+    }
+
+    @Test
+    public void tryMovePlayerReturnsFalseWhenBoardHasNoPlayer() {
+        Board board = new Board(2, 2);
+
+        assertFalse(boardService.tryMovePlayer(board, new Pair(1, 0)));
+    }
+
+    @Test
+    public void playerCannotMoveIntoNonBoxOccupant() {
+        Board board = new Board(1, 3);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+        board.getActors().put(new Pair(1, 0), new Player());
+
+        assertFalse(boardService.tryMovePlayer(board, new Pair(1, 0)));
         assertEquals(new Pair(0, 0), boardService.findPlayer(board));
     }
 
@@ -244,6 +386,80 @@ public class AppTest {
     }
 
     @Test
+    public void playerCannotPushBoxOutsideBoard() {
+        Board board = new Board(1, 2);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+        boardService.addActor(board, new Pair(1, 0), new Box());
+
+        assertFalse(boardService.tryMovePlayer(board, new Pair(1, 0)));
+        assertEquals(new Pair(0, 0), boardService.findPlayer(board));
+        assertEquals(Type.BOX, boardService.get(board, 1, 0).type());
+    }
+
+    @Test
+    public void undoReturnsFalseWhenHistoryIsEmpty() {
+        Board board = new Board(2, 2);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+
+        assertFalse(boardService.undo(board));
+    }
+
+    @Test
+    public void undoAfterSimpleMoveRestoresOnlyPlayerPosition() {
+        Board board = new Board(1, 3);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+
+        assertTrue(boardService.tryMovePlayer(board, new Pair(1, 0)));
+        assertTrue(boardService.undo(board));
+
+        assertEquals(new Pair(0, 0), boardService.findPlayer(board));
+        assertNull(boardService.get(board, 1, 0));
+    }
+
+    @Test
+    public void undoIgnoresIncompleteBoxMoveRecord() {
+        Board board = new Board(1, 3);
+        boardService.addActor(board, new Pair(1, 0), new Player());
+        board.getMoveHistory().add(new Board.MoveRecord(new Pair(0, 0), new Pair(1, 0), null, new Pair(2, 0)));
+
+        assertTrue(boardService.undo(board));
+        assertEquals(new Pair(0, 0), boardService.findPlayer(board));
+    }
+
+    @Test
+    public void undoIgnoresBoxRecordWithoutDestination() {
+        Board board = new Board(1, 3);
+        boardService.addActor(board, new Pair(1, 0), new Player());
+        board.getMoveHistory().add(new Board.MoveRecord(new Pair(0, 0), new Pair(1, 0), new Pair(2, 0), null));
+
+        assertTrue(boardService.undo(board));
+        assertEquals(new Pair(0, 0), boardService.findPlayer(board));
+    }
+
+    @Test
+    public void undoHandlesMoveRecordWithoutActorAtRecordedDestination() {
+        Board board = new Board(1, 2);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+        board.getMoveHistory().add(new Board.MoveRecord(new Pair(0, 0), new Pair(1, 0), null, null));
+
+        assertTrue(boardService.undo(board));
+        assertEquals(new Pair(0, 0), boardService.findPlayer(board));
+        assertEquals(Type.PLAYER, boardService.get(board, 0, 0).type());
+        assertNull(boardService.get(board, 1, 0));
+    }
+
+    @Test
+    public void undoIgnoresNonMovableActorsWhenRefreshingGoalFlags() {
+        Board board = new Board(1, 2);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+        board.getActors().put(new Pair(1, 0), new Wall());
+        board.getMoveHistory().add(new Board.MoveRecord(new Pair(0, 0), new Pair(0, 0), new Pair(1, 0), new Pair(1, 0)));
+
+        assertTrue(boardService.undo(board));
+        assertEquals(Type.WALL, boardService.get(board, 1, 0).type());
+    }
+
+    @Test
     public void pushedBoxOnGoalCompletesLevel() {
         Board board = new Board(1, 3);
         boardService.addActor(board, new Pair(0, 0), new Player());
@@ -264,6 +480,45 @@ public class AppTest {
         boardService.addActor(board, new Pair(0, 0), new Box());
 
         assertFalse(boardService.isSolved(board));
+    }
+
+    @Test
+    public void levelIsNotSolvedWhenABoxIsOutsideAnyGoal() {
+        Board board = new Board(1, 3);
+        boardService.addTerrain(board, new Pair(0, 0), new GoalPosition());
+        boardService.addActor(board, new Pair(0, 0), new Box());
+        boardService.addActor(board, new Pair(1, 0), new Box());
+
+        assertFalse(boardService.isSolved(board));
+    }
+
+    @Test
+    public void levelIsNotSolvedWhenThereAreNoGoals() {
+        Board board = new Board(1, 1);
+        boardService.addActor(board, new Pair(0, 0), new Box());
+
+        assertFalse(boardService.isSolved(board));
+    }
+
+    @Test
+    public void levelIsNotSolvedWhenBoxIsOnNonGoalTerrain() {
+        Board board = new Board(1, 3);
+        boardService.addTerrain(board, new Pair(0, 0), new GoalPosition());
+        board.getActors().put(new Pair(0, 0), new Box());
+        board.getTerrain().put(new Pair(1, 0), new Wall());
+        board.getActors().put(new Pair(1, 0), new Box());
+
+        assertFalse(boardService.isSolved(board));
+    }
+
+    @Test
+    public void renderReturnsEmptyStringForEmptyBoard() {
+        assertEquals("", boardService.render(new Board(0, 0)));
+    }
+
+    @Test
+    public void renderReturnsEmptyStringWhenBoardHasZeroColumns() {
+        assertEquals("", boardService.render(new Board(1, 0)));
     }
 
     private void solveLevelTwo(GameController controller) {
@@ -303,6 +558,55 @@ public class AppTest {
     private void move(GameController controller, Pair... directions) {
         for (Pair direction : directions) {
             controller.movePlayer(direction);
+        }
+    }
+
+    private LevelParserService parserWithSequence(LevelSpec... specs) {
+        return new LevelParserService() {
+            @Override
+            public Board parseResource(String fileName, BoardService ignoredBoardService) {
+                for (LevelSpec spec : specs) {
+                    if (!spec.fileName.equals(fileName)) {
+                        continue;
+                    }
+                    if (spec.errorMessage != null) {
+                        throw new IllegalArgumentException(spec.errorMessage);
+                    }
+                    return spec.board;
+                }
+                throw new IllegalArgumentException("Level file not found: " + fileName);
+            }
+
+            @Override
+            public Board parse(InputStream stream, String sourceName, BoardService ignoredBoardService) {
+                throw new UnsupportedOperationException("parse(InputStream, ...) is not used in this test");
+            }
+        };
+    }
+
+    private LevelSpec validLevel(String fileName, Board board) {
+        return new LevelSpec(fileName, board, null);
+    }
+
+    private LevelSpec invalidLevel(String fileName, String errorMessage) {
+        return new LevelSpec(fileName, null, errorMessage);
+    }
+
+    private Board board(String levelName) {
+        Board board = new Board(levelName, 1, 1);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+        return board;
+    }
+
+    private static final class LevelSpec {
+        private final String fileName;
+        private final Board board;
+        private final String errorMessage;
+
+        private LevelSpec(String fileName, Board board, String errorMessage) {
+            this.fileName = fileName;
+            this.board = board;
+            this.errorMessage = errorMessage;
         }
     }
 }

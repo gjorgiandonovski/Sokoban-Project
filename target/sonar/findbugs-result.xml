@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<BugCollection version="4.7.3" sequence="0" timestamp="1781364824438" analysisTimestamp="1781364854690" release="">
+  <Project>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/App.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/controller/GameController.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/controller/GameController$SaveGameState.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/Board.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/Board$MoveRecord.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/Box.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/GoalPosition.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/IObject.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/Pair.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/Player.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/Type.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/dto/Wall.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/services/implementations/BoardServiceImpl.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl$LevelCounts.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/services/implementations/PairServiceImpl.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/services/implementations/ServiceFactory.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/services/interfaces/BoardService.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/services/interfaces/LevelParserService.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/model/services/interfaces/PairService.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/view/GameView.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/view/SwingGameFrame.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/view/SwingGameFrame$1.class</Jar>
+    <Jar>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes/es/upm/pproject/sokoban/view/SwingGameFrame$BoardPanel.class</Jar>
+    <AuxClasspathEntry>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/classes</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/gjorgiandonovski/Library/Java/JavaVirtualMachines/corretto-11.0.25/Contents/Home/lib/jrt-fs.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/gjorgiandonovski/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/gjorgiandonovski/.m2/repository/org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/gjorgiandonovski/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.3/jaxb-impl-2.3.3.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/gjorgiandonovski/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/sonar/findbugs/annotations.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/sonar/findbugs/jsr305.jar</AuxClasspathEntry>
+    <WrkDir>/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/target/sonar</WrkDir>
+  </Project>
+  <BugInstance type="PCOA_PARTIALLY_CONSTRUCTED_OBJECT_ACCESS" priority="2" rank="9" abbrev="PCOA" category="CORRECTNESS" instanceHash="62c549f2dcb8abda52e401bf3deb33e3" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Constructor makes call to non-final method</ShortMessage>
+    <LongMessage>Constructor new es.upm.pproject.sokoban.controller.GameController() makes call to non-final method</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.controller.GameController" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController" start="24" end="265" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>At GameController.java:[lines 24-265]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.controller.GameController</Message>
+    </Class>
+    <Method classname="es.upm.pproject.sokoban.controller.GameController" name="&lt;init&gt;" signature="()V" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController" start="35" end="45" startBytecode="0" endBytecode="156" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java"/>
+      <Message>In method new es.upm.pproject.sokoban.controller.GameController()</Message>
+    </Method>
+    <SourceLine classname="es.upm.pproject.sokoban.controller.GameController" primary="true" start="43" end="43" startBytecode="51" endBytecode="51" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+      <Message>At GameController.java:[line 43]</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="FCBL_FIELD_COULD_BE_LOCAL" priority="2" rank="7" abbrev="FCBL" category="CORRECTNESS" instanceHash="ded9941e229a2be5c14a2af34985d384" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Class defines fields that are used only as locals</ShortMessage>
+    <LongMessage>Class es.upm.pproject.sokoban.controller.GameController$SaveGameState defines fields that are used only as locals</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" start="282" end="288" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>At GameController.java:[lines 282-288]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.controller.GameController$SaveGameState</Message>
+    </Class>
+    <Field classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" name="board" signature="Les/upm/pproject/sokoban/model/dto/Board;" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>In GameController.java</Message>
+      </SourceLine>
+      <Message>Field es.upm.pproject.sokoban.controller.GameController$SaveGameState.board</Message>
+    </Field>
+    <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true" start="284" end="284" startBytecode="11" endBytecode="11" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+      <Message>At GameController.java:[line 284]</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="FCBL_FIELD_COULD_BE_LOCAL" priority="2" rank="7" abbrev="FCBL" category="CORRECTNESS" instanceHash="8307df82ad522cac24f3d69f170dabaa" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Class defines fields that are used only as locals</ShortMessage>
+    <LongMessage>Class es.upm.pproject.sokoban.controller.GameController$SaveGameState defines fields that are used only as locals</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" start="282" end="288" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>At GameController.java:[lines 282-288]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.controller.GameController$SaveGameState</Message>
+    </Class>
+    <Field classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" name="currentLevelScoreRecorded" signature="Z" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>In GameController.java</Message>
+      </SourceLine>
+      <Message>Field es.upm.pproject.sokoban.controller.GameController$SaveGameState.currentLevelScoreRecorded</Message>
+    </Field>
+    <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true" start="287" end="287" startBytecode="28" endBytecode="28" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+      <Message>At GameController.java:[line 287]</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="FCBL_FIELD_COULD_BE_LOCAL" priority="2" rank="7" abbrev="FCBL" category="CORRECTNESS" instanceHash="f21b16d312a73070527d967b5a70821f" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Class defines fields that are used only as locals</ShortMessage>
+    <LongMessage>Class es.upm.pproject.sokoban.controller.GameController$SaveGameState defines fields that are used only as locals</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" start="282" end="288" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>At GameController.java:[lines 282-288]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.controller.GameController$SaveGameState</Message>
+    </Class>
+    <Field classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" name="globalScore" signature="I" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>In GameController.java</Message>
+      </SourceLine>
+      <Message>Field es.upm.pproject.sokoban.controller.GameController$SaveGameState.globalScore</Message>
+    </Field>
+    <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true" start="286" end="286" startBytecode="22" endBytecode="22" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+      <Message>At GameController.java:[line 286]</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="FCBL_FIELD_COULD_BE_LOCAL" priority="2" rank="7" abbrev="FCBL" category="CORRECTNESS" instanceHash="c5cdded54f2673fd077a4cc5f301078d" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Class defines fields that are used only as locals</ShortMessage>
+    <LongMessage>Class es.upm.pproject.sokoban.controller.GameController$SaveGameState defines fields that are used only as locals</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" start="282" end="288" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>At GameController.java:[lines 282-288]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.controller.GameController$SaveGameState</Message>
+    </Class>
+    <Field classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" name="levelNumber" signature="I" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>In GameController.java</Message>
+      </SourceLine>
+      <Message>Field es.upm.pproject.sokoban.controller.GameController$SaveGameState.levelNumber</Message>
+    </Field>
+    <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true" start="283" end="283" startBytecode="6" endBytecode="6" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+      <Message>At GameController.java:[line 283]</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="FCBL_FIELD_COULD_BE_LOCAL" priority="2" rank="7" abbrev="FCBL" category="CORRECTNESS" instanceHash="d90a807c42a008975960b77663333eaa" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Class defines fields that are used only as locals</ShortMessage>
+    <LongMessage>Class es.upm.pproject.sokoban.controller.GameController$SaveGameState defines fields that are used only as locals</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" start="282" end="288" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>At GameController.java:[lines 282-288]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.controller.GameController$SaveGameState</Message>
+    </Class>
+    <Field classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" name="levelScore" signature="I" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+        <Message>In GameController.java</Message>
+      </SourceLine>
+      <Message>Field es.upm.pproject.sokoban.controller.GameController$SaveGameState.levelScore</Message>
+    </Field>
+    <SourceLine classname="es.upm.pproject.sokoban.controller.GameController$SaveGameState" primary="true" start="285" end="285" startBytecode="16" endBytecode="16" sourcefile="GameController.java" sourcepath="es/upm/pproject/sokoban/controller/GameController.java">
+      <Message>At GameController.java:[line 285]</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="CLI_CONSTANT_LIST_INDEX" priority="2" rank="7" abbrev="CLI" category="CORRECTNESS" instanceHash="49f328208bd168f95e37d48be36c2991" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Method accesses list or array with constant index</ShortMessage>
+    <LongMessage>Method es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl.parse(BufferedReader, String, BoardService) accesses list or array with constant index</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl" start="21" end="166" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+        <Message>At LevelParserServiceImpl.java:[lines 21-166]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl</Message>
+    </Class>
+    <Method classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl" name="parse" signature="(Ljava/io/BufferedReader;Ljava/lang/String;Les/upm/pproject/sokoban/model/services/interfaces/BoardService;)Les/upm/pproject/sokoban/model/dto/Board;" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl" start="58" end="96" startBytecode="0" endBytecode="611" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java"/>
+      <Message>In method es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl.parse(BufferedReader, String, BoardService)</Message>
+    </Method>
+    <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl" primary="true" start="69" end="69" startBytecode="79" endBytecode="79" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+      <Message>At LevelParserServiceImpl.java:[line 69]</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="FCBL_FIELD_COULD_BE_LOCAL" priority="2" rank="7" abbrev="FCBL" category="CORRECTNESS" instanceHash="38f17b4ed1ec308fa5c4fcc9f4e5f37e" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Class defines fields that are used only as locals</ShortMessage>
+    <LongMessage>Class es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts defines fields that are used only as locals</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" start="168" end="168" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+        <Message>At LevelParserServiceImpl.java:[line 168]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts</Message>
+    </Class>
+    <Field classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" name="boxes" signature="I" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+        <Message>In LevelParserServiceImpl.java</Message>
+      </SourceLine>
+      <Message>Field es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts.boxes</Message>
+    </Field>
+    <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java" synthetic="true">
+      <Message>In LevelParserServiceImpl.java</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="FCBL_FIELD_COULD_BE_LOCAL" priority="2" rank="7" abbrev="FCBL" category="CORRECTNESS" instanceHash="8d8f5d80e5657df81962d9604dffc416" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Class defines fields that are used only as locals</ShortMessage>
+    <LongMessage>Class es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts defines fields that are used only as locals</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" start="168" end="168" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+        <Message>At LevelParserServiceImpl.java:[line 168]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts</Message>
+    </Class>
+    <Field classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" name="goals" signature="I" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+        <Message>In LevelParserServiceImpl.java</Message>
+      </SourceLine>
+      <Message>Field es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts.goals</Message>
+    </Field>
+    <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java" synthetic="true">
+      <Message>In LevelParserServiceImpl.java</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="FCBL_FIELD_COULD_BE_LOCAL" priority="2" rank="7" abbrev="FCBL" category="CORRECTNESS" instanceHash="4ffd5a33ab2ffe7bb3823e2518de9f7a" instanceOccurrenceNum="0" instanceOccurrenceMax="0">
+    <ShortMessage>Class defines fields that are used only as locals</ShortMessage>
+    <LongMessage>Class es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts defines fields that are used only as locals</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" start="168" end="168" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+        <Message>At LevelParserServiceImpl.java:[line 168]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts</Message>
+    </Class>
+    <Field classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" name="players" signature="I" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+        <Message>In LevelParserServiceImpl.java</Message>
+      </SourceLine>
+      <Message>Field es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts.players</Message>
+    </Field>
+    <SourceLine classname="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" sourcefile="LevelParserServiceImpl.java" sourcepath="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java" synthetic="true">
+      <Message>In LevelParserServiceImpl.java</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugInstance type="DM_EXIT" priority="2" rank="16" abbrev="Dm" category="BAD_PRACTICE" instanceHash="c5905e0c1515a710539edae074cab33d" instanceOccurrenceNum="0" instanceOccurrenceMax="0" cweid="382">
+    <ShortMessage>Method invokes System.exit(...)</ShortMessage>
+    <LongMessage>es.upm.pproject.sokoban.view.SwingGameFrame.closeApplication() invokes System.exit(...), which shuts down the entire virtual machine</LongMessage>
+    <Class classname="es.upm.pproject.sokoban.view.SwingGameFrame" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.view.SwingGameFrame" start="47" end="361" sourcefile="SwingGameFrame.java" sourcepath="es/upm/pproject/sokoban/view/SwingGameFrame.java">
+        <Message>At SwingGameFrame.java:[lines 47-361]</Message>
+      </SourceLine>
+      <Message>In class es.upm.pproject.sokoban.view.SwingGameFrame</Message>
+    </Class>
+    <Method classname="es.upm.pproject.sokoban.view.SwingGameFrame" name="closeApplication" signature="()V" isStatic="false" primary="true">
+      <SourceLine classname="es.upm.pproject.sokoban.view.SwingGameFrame" start="300" end="303" startBytecode="0" endBytecode="72" sourcefile="SwingGameFrame.java" sourcepath="es/upm/pproject/sokoban/view/SwingGameFrame.java"/>
+      <Message>In method es.upm.pproject.sokoban.view.SwingGameFrame.closeApplication()</Message>
+    </Method>
+    <SourceLine classname="es.upm.pproject.sokoban.view.SwingGameFrame" primary="true" start="302" end="302" startBytecode="15" endBytecode="15" sourcefile="SwingGameFrame.java" sourcepath="es/upm/pproject/sokoban/view/SwingGameFrame.java">
+      <Message>At SwingGameFrame.java:[line 302]</Message>
+    </SourceLine>
+  </BugInstance>
+  <BugCategory category="BAD_PRACTICE">
+    <Description>Bad practice</Description>
+  </BugCategory>
+  <BugCategory category="CORRECTNESS">
+    <Description>Correctness</Description>
+  </BugCategory>
+  <BugPattern type="CLI_CONSTANT_LIST_INDEX" abbrev="CLI" category="CORRECTNESS">
+    <ShortDescription>Method accesses list or array with constant index</ShortDescription>
+    <Details><![CDATA[
+			
+			<p>This method accesses an array or list using a constant integer index. Often,
+			this is a typo where a loop variable is intended to be used. If however, specific
+			list indices mean different specific things, then perhaps replacing the list with
+			a first-class object with meaningful accessors would make the code less brittle.</p>
+			
+		]]></Details>
+  </BugPattern>
+  <BugPattern type="FCBL_FIELD_COULD_BE_LOCAL" abbrev="FCBL" category="CORRECTNESS">
+    <ShortDescription>Class defines fields that are used only as locals</ShortDescription>
+    <Details><![CDATA[
+			
+			<p>This class defines fields that are used in a local only fashion,
+			specifically private fields or protected fields in final classes that are accessed
+			first in each method with a store vs. a load. This field could be replaced by one
+			or more local variables.</p>
+			
+		]]></Details>
+  </BugPattern>
+  <BugPattern type="PCOA_PARTIALLY_CONSTRUCTED_OBJECT_ACCESS" abbrev="PCOA" category="CORRECTNESS">
+    <ShortDescription>Constructor makes call to non-final method</ShortDescription>
+    <Details><![CDATA[
+			
+			<p>This constructor makes a call to a non-final method. Since this method can be overridden, a subclass'
+			implementation will be executing against an object that has not been initialized at the subclass level.
+			You should mark all methods called from the constructor as final to avoid this problem.</p>
+			
+		]]></Details>
+  </BugPattern>
+  <BugPattern type="DM_EXIT" abbrev="Dm" category="BAD_PRACTICE" cweid="382">
+    <ShortDescription>Method invokes System.exit(...)</ShortDescription>
+    <Details><![CDATA[
+
+  <p> Invoking System.exit shuts down the entire Java virtual machine. This
+   should only been done when it is appropriate. Such calls make it
+   hard or impossible for your code to be invoked by other code.
+   Consider throwing a RuntimeException instead.</p>
+
+    ]]></Details>
+  </BugPattern>
+  <BugCode abbrev="PCOA">
+    <Description>Partially Constructed Object Access</Description>
+  </BugCode>
+  <BugCode abbrev="CLI">
+    <Description>Constant List Index</Description>
+  </BugCode>
+  <BugCode abbrev="FCBL">
+    <Description>Field Could Be Local</Description>
+  </BugCode>
+  <BugCode abbrev="Dm">
+    <Description>Dubious method used</Description>
+  </BugCode>
+  <Errors errors="0" missingClasses="0"></Errors>
+  <FindBugsSummary timestamp="Sat, 13 Jun 2026 17:33:44 +0200" total_classes="24" referenced_classes="400" total_bugs="11" total_size="1155" num_packages="6" java_version="11.0.25" vm_version="11.0.25+9-LTS" cpu_seconds="22.38" clock_seconds="11.74" peak_mbytes="581.27" alloc_mbytes="4608.00" gc_seconds="0.17" priority_2="11">
+    <FileStats path="es/upm/pproject/sokoban/App.java" bugCount="0" size="46"/>
+    <FileStats path="es/upm/pproject/sokoban/controller/GameController.java" bugCount="6" size="185" bugHash="668de56979a348aad5700e63037c8435"/>
+    <FileStats path="es/upm/pproject/sokoban/model/dto/Board.java" bugCount="0" size="61"/>
+    <FileStats path="es/upm/pproject/sokoban/model/dto/Box.java" bugCount="0" size="16"/>
+    <FileStats path="es/upm/pproject/sokoban/model/dto/GoalPosition.java" bugCount="0" size="12"/>
+    <FileStats path="es/upm/pproject/sokoban/model/dto/IObject.java" bugCount="0" size="5"/>
+    <FileStats path="es/upm/pproject/sokoban/model/dto/Pair.java" bugCount="0" size="25"/>
+    <FileStats path="es/upm/pproject/sokoban/model/dto/Player.java" bugCount="0" size="16"/>
+    <FileStats path="es/upm/pproject/sokoban/model/dto/Type.java" bugCount="0" size="12"/>
+    <FileStats path="es/upm/pproject/sokoban/model/dto/Wall.java" bugCount="0" size="12"/>
+    <FileStats path="es/upm/pproject/sokoban/model/services/implementations/BoardServiceImpl.java" bugCount="0" size="190"/>
+    <FileStats path="es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java" bugCount="4" size="102" bugHash="4ed4f23a30d7fa47e4568ffa73b76295"/>
+    <FileStats path="es/upm/pproject/sokoban/model/services/implementations/PairServiceImpl.java" bugCount="0" size="12"/>
+    <FileStats path="es/upm/pproject/sokoban/model/services/implementations/ServiceFactory.java" bugCount="0" size="9"/>
+    <FileStats path="es/upm/pproject/sokoban/model/services/interfaces/BoardService.java" bugCount="0" size="9"/>
+    <FileStats path="es/upm/pproject/sokoban/model/services/interfaces/LevelParserService.java" bugCount="0" size="3"/>
+    <FileStats path="es/upm/pproject/sokoban/model/services/interfaces/PairService.java" bugCount="0" size="3"/>
+    <FileStats path="es/upm/pproject/sokoban/view/GameView.java" bugCount="0" size="28"/>
+    <FileStats path="es/upm/pproject/sokoban/view/SwingGameFrame.java" bugCount="1" size="409" bugHash="6dad46b9a07ed35f391f0502750beb0f"/>
+    <PackageStats package="es.upm.pproject.sokoban" total_bugs="0" total_types="1" total_size="46">
+      <ClassStats class="es.upm.pproject.sokoban.App" sourceFile="App.java" interface="false" size="46" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="es.upm.pproject.sokoban.controller" total_bugs="6" total_types="2" total_size="185" priority_2="6">
+      <ClassStats class="es.upm.pproject.sokoban.controller.GameController" sourceFile="GameController.java" interface="false" size="170" bugs="1" priority_2="1"/>
+      <ClassStats class="es.upm.pproject.sokoban.controller.GameController$SaveGameState" sourceFile="GameController.java" interface="false" size="15" bugs="5" priority_2="5"/>
+    </PackageStats>
+    <PackageStats package="es.upm.pproject.sokoban.model.dto" total_bugs="0" total_types="9" total_size="159">
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.Board" sourceFile="Board.java" interface="false" size="40" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.Board$MoveRecord" sourceFile="Board.java" interface="false" size="21" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.Box" sourceFile="Box.java" interface="false" size="16" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.GoalPosition" sourceFile="GoalPosition.java" interface="false" size="12" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.IObject" sourceFile="IObject.java" interface="true" size="5" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.Pair" sourceFile="Pair.java" interface="false" size="25" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.Player" sourceFile="Player.java" interface="false" size="16" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.Type" sourceFile="Type.java" interface="false" size="12" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.dto.Wall" sourceFile="Wall.java" interface="false" size="12" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="es.upm.pproject.sokoban.model.services.implementations" total_bugs="4" total_types="5" total_size="313" priority_2="4">
+      <ClassStats class="es.upm.pproject.sokoban.model.services.implementations.BoardServiceImpl" sourceFile="BoardServiceImpl.java" interface="false" size="190" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl" sourceFile="LevelParserServiceImpl.java" interface="false" size="96" bugs="1" priority_2="1"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts" sourceFile="LevelParserServiceImpl.java" interface="false" size="6" bugs="3" priority_2="3"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.services.implementations.PairServiceImpl" sourceFile="PairServiceImpl.java" interface="false" size="12" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.services.implementations.ServiceFactory" sourceFile="ServiceFactory.java" interface="false" size="9" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="es.upm.pproject.sokoban.model.services.interfaces" total_bugs="0" total_types="3" total_size="15">
+      <ClassStats class="es.upm.pproject.sokoban.model.services.interfaces.BoardService" sourceFile="BoardService.java" interface="true" size="9" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.services.interfaces.LevelParserService" sourceFile="LevelParserService.java" interface="true" size="3" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.model.services.interfaces.PairService" sourceFile="PairService.java" interface="true" size="3" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="es.upm.pproject.sokoban.view" total_bugs="1" total_types="4" total_size="437" priority_2="1">
+      <ClassStats class="es.upm.pproject.sokoban.view.GameView" sourceFile="GameView.java" interface="false" size="28" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.view.SwingGameFrame" sourceFile="SwingGameFrame.java" interface="false" size="251" bugs="1" priority_2="1"/>
+      <ClassStats class="es.upm.pproject.sokoban.view.SwingGameFrame$1" sourceFile="SwingGameFrame.java" interface="false" size="9" bugs="0"/>
+      <ClassStats class="es.upm.pproject.sokoban.view.SwingGameFrame$BoardPanel" sourceFile="SwingGameFrame.java" interface="false" size="149" bugs="0"/>
+    </PackageStats>
+    <FindBugsProfile>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.ClassInfoAnalysisEngine" totalMilliseconds="1305" invocations="1855" avgMicrosecondsPerInvocation="704" maxMicrosecondsPerInvocation="57398" standardDeviationMicrosecondsPerInvocation="2473"/>
+      <ClassProfile name="com.mebigfatguy.fbcontrib.collect.CollectStatistics" totalMilliseconds="676" invocations="400" avgMicrosecondsPerInvocation="1692" maxMicrosecondsPerInvocation="102276" standardDeviationMicrosecondsPerInvocation="6123"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FieldItemSummary" totalMilliseconds="562" invocations="400" avgMicrosecondsPerInvocation="1405" maxMicrosecondsPerInvocation="36920" standardDeviationMicrosecondsPerInvocation="3145"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindNoSideEffectMethods" totalMilliseconds="554" invocations="400" avgMicrosecondsPerInvocation="1387" maxMicrosecondsPerInvocation="61590" standardDeviationMicrosecondsPerInvocation="4026"/>
+      <ClassProfile name="edu.umd.cs.findbugs.OpcodeStack$JumpInfoFactory" totalMilliseconds="405" invocations="1030" avgMicrosecondsPerInvocation="393" maxMicrosecondsPerInvocation="24015" standardDeviationMicrosecondsPerInvocation="1418"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.NoteDirectlyRelevantTypeQualifiers" totalMilliseconds="362" invocations="400" avgMicrosecondsPerInvocation="905" maxMicrosecondsPerInvocation="190331" standardDeviationMicrosecondsPerInvocation="9573"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.ClassDataAnalysisEngine" totalMilliseconds="307" invocations="1900" avgMicrosecondsPerInvocation="161" maxMicrosecondsPerInvocation="9685" standardDeviationMicrosecondsPerInvocation="324"/>
+      <ClassProfile name="com.mebigfatguy.fbcontrib.collect.CollectNullableMethodStatus" totalMilliseconds="236" invocations="400" avgMicrosecondsPerInvocation="591" maxMicrosecondsPerInvocation="17593" standardDeviationMicrosecondsPerInvocation="1471"/>
+      <ClassProfile name="edu.umd.cs.findbugs.ba.npe.NullDerefAndRedundantComparisonFinder" totalMilliseconds="220" invocations="179" avgMicrosecondsPerInvocation="1229" maxMicrosecondsPerInvocation="91640" standardDeviationMicrosecondsPerInvocation="6898"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.EqualsOperandShouldHaveClassCompatibleWithThis" totalMilliseconds="200" invocations="400" avgMicrosecondsPerInvocation="501" maxMicrosecondsPerInvocation="132310" standardDeviationMicrosecondsPerInvocation="6618"/>
+      <ClassProfile name="com.mebigfatguy.fbcontrib.detect.ContainsBasedConditional" totalMilliseconds="188" invocations="24" avgMicrosecondsPerInvocation="7844" maxMicrosecondsPerInvocation="180417" standardDeviationMicrosecondsPerInvocation="35987"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.OverridingEqualsNotSymmetrical" totalMilliseconds="179" invocations="400" avgMicrosecondsPerInvocation="449" maxMicrosecondsPerInvocation="80470" standardDeviationMicrosecondsPerInvocation="4128"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.JavaClassAnalysisEngine" totalMilliseconds="169" invocations="842" avgMicrosecondsPerInvocation="201" maxMicrosecondsPerInvocation="18488" standardDeviationMicrosecondsPerInvocation="783"/>
+      <ClassProfile name="edu.umd.cs.findbugs.util.TopologicalSort" totalMilliseconds="158" invocations="1802" avgMicrosecondsPerInvocation="87" maxMicrosecondsPerInvocation="61764" standardDeviationMicrosecondsPerInvocation="1466"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.ExplicitSerialization" totalMilliseconds="138" invocations="400" avgMicrosecondsPerInvocation="347" maxMicrosecondsPerInvocation="16215" standardDeviationMicrosecondsPerInvocation="1782"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FindRefComparison$SpecialTypeAnalysis" totalMilliseconds="136" invocations="142" avgMicrosecondsPerInvocation="957" maxMicrosecondsPerInvocation="78360" standardDeviationMicrosecondsPerInvocation="6537"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.BuildObligationPolicyDatabase" totalMilliseconds="134" invocations="400" avgMicrosecondsPerInvocation="336" maxMicrosecondsPerInvocation="8446" standardDeviationMicrosecondsPerInvocation="653"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.IsNullValueDataflowFactory" totalMilliseconds="133" invocations="180" avgMicrosecondsPerInvocation="740" maxMicrosecondsPerInvocation="13886" standardDeviationMicrosecondsPerInvocation="1269"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.CFGFactory" totalMilliseconds="132" invocations="180" avgMicrosecondsPerInvocation="737" maxMicrosecondsPerInvocation="23574" standardDeviationMicrosecondsPerInvocation="2067"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.TypeDataflowFactory" totalMilliseconds="132" invocations="186" avgMicrosecondsPerInvocation="712" maxMicrosecondsPerInvocation="15498" standardDeviationMicrosecondsPerInvocation="1703"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.ValueNumberDataflowFactory" totalMilliseconds="127" invocations="186" avgMicrosecondsPerInvocation="685" maxMicrosecondsPerInvocation="18071" standardDeviationMicrosecondsPerInvocation="1591"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.CalledMethods" totalMilliseconds="109" invocations="400" avgMicrosecondsPerInvocation="274" maxMicrosecondsPerInvocation="13219" standardDeviationMicrosecondsPerInvocation="800"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.MethodGenFactory" totalMilliseconds="106" invocations="196" avgMicrosecondsPerInvocation="542" maxMicrosecondsPerInvocation="53068" standardDeviationMicrosecondsPerInvocation="3840"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.FunctionsThatMightBeMistakenForProcedures" totalMilliseconds="105" invocations="400" avgMicrosecondsPerInvocation="263" maxMicrosecondsPerInvocation="10377" standardDeviationMicrosecondsPerInvocation="682"/>
+      <ClassProfile name="edu.umd.cs.findbugs.classfile.engine.bcel.UnconditionalValueDerefDataflowFactory" totalMilliseconds="95" invocations="180" avgMicrosecondsPerInvocation="529" maxMicrosecondsPerInvocation="6959" standardDeviationMicrosecondsPerInvocation="786"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.BuildStringPassthruGraph" totalMilliseconds="88" invocations="400" avgMicrosecondsPerInvocation="220" maxMicrosecondsPerInvocation="11786" standardDeviationMicrosecondsPerInvocation="786"/>
+      <ClassProfile name="com.mebigfatguy.fbcontrib.collect.CollectMethodsReturningImmutableCollections" totalMilliseconds="79" invocations="400" avgMicrosecondsPerInvocation="199" maxMicrosecondsPerInvocation="9484" standardDeviationMicrosecondsPerInvocation="599"/>
+      <ClassProfile name="com.mebigfatguy.fbcontrib.detect.InefficientStringBuffering" totalMilliseconds="72" invocations="24" avgMicrosecondsPerInvocation="3029" maxMicrosecondsPerInvocation="63043" standardDeviationMicrosecondsPerInvocation="12531"/>
+      <ClassProfile name="edu.umd.cs.findbugs.detect.ReflectiveClasses" totalMilliseconds="69" invocations="400" avgMicrosecondsPerInvocation="173" maxMicrosecondsPerInvocation="5371" standardDeviationMicrosecondsPerInvocation="384"/>
+    </FindBugsProfile>
+  </FindBugsSummary>
+  <ClassFeatures></ClassFeatures>
+  <History></History>
+</BugCollection>

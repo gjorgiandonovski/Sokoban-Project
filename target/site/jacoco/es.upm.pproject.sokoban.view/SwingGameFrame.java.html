@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwingGameFrame.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sokoban</a> &gt; <a href="index.source.html" class="el_package">es.upm.pproject.sokoban.view</a> &gt; <span class="el_source">SwingGameFrame.java</span></div><h1>SwingGameFrame.java</h1><pre class="source lang-java linenums">package es.upm.pproject.sokoban.view;
+
+import static es.upm.pproject.sokoban.model.dto.Type.BOX;
+import static es.upm.pproject.sokoban.model.dto.Type.GOALPOSITION;
+import static es.upm.pproject.sokoban.model.dto.Type.PLAYER;
+import static es.upm.pproject.sokoban.model.dto.Type.WALL;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import es.upm.pproject.sokoban.controller.GameController;
+import es.upm.pproject.sokoban.model.dto.IObject;
+import es.upm.pproject.sokoban.model.dto.Pair;
+
+public class SwingGameFrame extends JFrame {
+    private static final long serialVersionUID = 1L;
+<span class="nc" id="L48">    private static final Logger LOGGER = LoggerFactory.getLogger(SwingGameFrame.class);</span>
+
+<span class="nc" id="L50">    private static final Pair UP = new Pair(0, -1);</span>
+<span class="nc" id="L51">    private static final Pair DOWN = new Pair(0, 1);</span>
+<span class="nc" id="L52">    private static final Pair LEFT = new Pair(-1, 0);</span>
+<span class="nc" id="L53">    private static final Pair RIGHT = new Pair(1, 0);</span>
+<span class="nc" id="L54">    private static final Dimension BUTTON_SIZE = new Dimension(92, 34);</span>
+    private static final String SAVE_EXTENSION = &quot;.sok&quot;;
+
+    private final GameController controller;
+    private final BoardPanel boardPanel;
+    private final JLabel levelLabel;
+    private final JLabel levelScoreLabel;
+    private final JLabel globalScoreLabel;
+    private final JLabel statusLabel;
+    private boolean gameCompleted;
+    private boolean advancingLevel;
+    private Timer levelAdvanceTimer;
+
+    public SwingGameFrame(GameController controller) {
+<span class="nc" id="L68">        super(&quot;Sokoban&quot;);</span>
+<span class="nc" id="L69">        this.controller = controller;</span>
+<span class="nc" id="L70">        this.boardPanel = new BoardPanel(controller);</span>
+<span class="nc" id="L71">        this.levelLabel = createInfoLabel();</span>
+<span class="nc" id="L72">        this.levelScoreLabel = createInfoLabel();</span>
+<span class="nc" id="L73">        this.globalScoreLabel = createInfoLabel();</span>
+<span class="nc" id="L74">        this.statusLabel = createStatusLabel();</span>
+
+<span class="nc" id="L76">        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L77">        setJMenuBar(createMenuBar());</span>
+<span class="nc" id="L78">        setLayout(new BorderLayout());</span>
+<span class="nc" id="L79">        setMinimumSize(new Dimension(640, 560));</span>
+
+<span class="nc" id="L81">        add(createHeaderPanel(), BorderLayout.NORTH);</span>
+<span class="nc" id="L82">        add(boardPanel, BorderLayout.CENTER);</span>
+<span class="nc" id="L83">        add(createControlPanel(), BorderLayout.SOUTH);</span>
+
+<span class="nc" id="L85">        installKeyBindings();</span>
+<span class="nc" id="L86">        refresh(&quot;Ready&quot;);</span>
+<span class="nc" id="L87">        pack();</span>
+<span class="nc" id="L88">        setLocationRelativeTo(null);</span>
+<span class="nc" id="L89">        LOGGER.info(&quot;Swing game frame initialized&quot;);</span>
+<span class="nc" id="L90">    }</span>
+
+    private JMenuBar createMenuBar() {
+<span class="nc" id="L93">        JMenuBar menuBar = new JMenuBar();</span>
+<span class="nc" id="L94">        JMenu gameMenu = new JMenu(&quot;Game&quot;);</span>
+<span class="nc" id="L95">        gameMenu.add(createMenuItem(&quot;New Game&quot;, this::newGame));</span>
+<span class="nc" id="L96">        gameMenu.add(createMenuItem(&quot;Restart Current Level&quot;, this::restartLevel));</span>
+<span class="nc" id="L97">        gameMenu.add(createMenuItem(&quot;Undo Last Movement&quot;, this::undoMove));</span>
+<span class="nc" id="L98">        gameMenu.addSeparator();</span>
+<span class="nc" id="L99">        gameMenu.add(createMenuItem(&quot;Save Game&quot;, this::saveGame));</span>
+<span class="nc" id="L100">        gameMenu.add(createMenuItem(&quot;Open Saved Game&quot;, this::openSavedGame));</span>
+<span class="nc" id="L101">        gameMenu.addSeparator();</span>
+<span class="nc" id="L102">        gameMenu.add(createMenuItem(&quot;Close Application&quot;, this::closeApplication));</span>
+<span class="nc" id="L103">        menuBar.add(gameMenu);</span>
+<span class="nc" id="L104">        return menuBar;</span>
+    }
+
+    private JMenuItem createMenuItem(String text, Runnable action) {
+<span class="nc" id="L108">        JMenuItem item = new JMenuItem(text);</span>
+<span class="nc" id="L109">        item.addActionListener(event -&gt; action.run());</span>
+<span class="nc" id="L110">        return item;</span>
+    }
+
+    private JPanel createHeaderPanel() {
+<span class="nc" id="L114">        JPanel header = new JPanel(new GridLayout(1, 3, 12, 0));</span>
+<span class="nc" id="L115">        header.setBorder(new EmptyBorder(14, 16, 10, 16));</span>
+<span class="nc" id="L116">        header.setBackground(new Color(245, 247, 250));</span>
+<span class="nc" id="L117">        header.add(levelLabel);</span>
+<span class="nc" id="L118">        header.add(levelScoreLabel);</span>
+<span class="nc" id="L119">        header.add(globalScoreLabel);</span>
+<span class="nc" id="L120">        return header;</span>
+    }
+
+    private JPanel createControlPanel() {
+<span class="nc" id="L124">        JPanel controls = new JPanel(new BorderLayout(12, 8));</span>
+<span class="nc" id="L125">        controls.setBorder(new EmptyBorder(10, 16, 14, 16));</span>
+<span class="nc" id="L126">        controls.setBackground(new Color(245, 247, 250));</span>
+
+<span class="nc" id="L128">        JPanel actions = new JPanel(new GridLayout(1, 2, 8, 0));</span>
+<span class="nc" id="L129">        actions.setOpaque(false);</span>
+<span class="nc" id="L130">        actions.add(createButton(&quot;Undo&quot;, this::undoMove));</span>
+<span class="nc" id="L131">        actions.add(createButton(&quot;Restart&quot;, this::restartLevel));</span>
+
+<span class="nc" id="L133">        controls.add(actions, BorderLayout.CENTER);</span>
+<span class="nc" id="L134">        controls.add(statusLabel, BorderLayout.SOUTH);</span>
+<span class="nc" id="L135">        return controls;</span>
+    }
+
+    private JButton createButton(String text, Runnable action) {
+<span class="nc" id="L139">        JButton button = new JButton(text);</span>
+<span class="nc" id="L140">        button.setPreferredSize(BUTTON_SIZE);</span>
+<span class="nc" id="L141">        button.setFocusPainted(false);</span>
+<span class="nc" id="L142">        button.addActionListener(event -&gt; action.run());</span>
+<span class="nc" id="L143">        return button;</span>
+    }
+
+    private JLabel createInfoLabel() {
+<span class="nc" id="L147">        JLabel label = new JLabel(&quot;&quot;, SwingConstants.CENTER);</span>
+<span class="nc" id="L148">        label.setFont(label.getFont().deriveFont(Font.BOLD, 15f));</span>
+<span class="nc" id="L149">        label.setOpaque(true);</span>
+<span class="nc" id="L150">        label.setBackground(Color.WHITE);</span>
+<span class="nc" id="L151">        label.setBorder(BorderFactory.createCompoundBorder(</span>
+<span class="nc" id="L152">            BorderFactory.createLineBorder(new Color(213, 219, 225)),</span>
+            new EmptyBorder(8, 10, 8, 10)
+        ));
+<span class="nc" id="L155">        return label;</span>
+    }
+
+    private JLabel createStatusLabel() {
+<span class="nc" id="L159">        JLabel label = new JLabel(&quot;&quot;, SwingConstants.CENTER);</span>
+<span class="nc" id="L160">        label.setFont(label.getFont().deriveFont(Font.PLAIN, 13f));</span>
+<span class="nc" id="L161">        label.setBorder(new EmptyBorder(8, 0, 0, 0));</span>
+<span class="nc" id="L162">        return label;</span>
+    }
+
+    private void installKeyBindings() {
+<span class="nc" id="L166">        JComponent root = getRootPane();</span>
+<span class="nc" id="L167">        bind(root, KeyStroke.getKeyStroke(&quot;UP&quot;), &quot;moveUp&quot;, () -&gt; movePlayer(UP));</span>
+<span class="nc" id="L168">        bind(root, KeyStroke.getKeyStroke(&quot;DOWN&quot;), &quot;moveDown&quot;, () -&gt; movePlayer(DOWN));</span>
+<span class="nc" id="L169">        bind(root, KeyStroke.getKeyStroke(&quot;LEFT&quot;), &quot;moveLeft&quot;, () -&gt; movePlayer(LEFT));</span>
+<span class="nc" id="L170">        bind(root, KeyStroke.getKeyStroke(&quot;RIGHT&quot;), &quot;moveRight&quot;, () -&gt; movePlayer(RIGHT));</span>
+<span class="nc" id="L171">        bind(root, KeyStroke.getKeyStroke('w'), &quot;moveW&quot;, () -&gt; movePlayer(UP));</span>
+<span class="nc" id="L172">        bind(root, KeyStroke.getKeyStroke('s'), &quot;moveS&quot;, () -&gt; movePlayer(DOWN));</span>
+<span class="nc" id="L173">        bind(root, KeyStroke.getKeyStroke('a'), &quot;moveA&quot;, () -&gt; movePlayer(LEFT));</span>
+<span class="nc" id="L174">        bind(root, KeyStroke.getKeyStroke('d'), &quot;moveD&quot;, () -&gt; movePlayer(RIGHT));</span>
+<span class="nc" id="L175">        bind(root, KeyStroke.getKeyStroke('u'), &quot;undo&quot;, this::undoMove);</span>
+<span class="nc" id="L176">        bind(root, KeyStroke.getKeyStroke('r'), &quot;restart&quot;, this::restartLevel);</span>
+<span class="nc" id="L177">    }</span>
+
+    private void bind(JComponent component, KeyStroke keyStroke, String name, Runnable action) {
+<span class="nc" id="L180">        component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, name);</span>
+<span class="nc" id="L181">        component.getActionMap().put(name, new AbstractAction() {</span>
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+<span class="nc" id="L186">                action.run();</span>
+<span class="nc" id="L187">            }</span>
+        });
+<span class="nc" id="L189">    }</span>
+
+    private void movePlayer(Pair direction) {
+<span class="nc bnc" id="L192" title="All 6 branches missed.">        if (gameCompleted || advancingLevel || controller.isSolved()) {</span>
+<span class="nc" id="L193">            return;</span>
+        }
+
+<span class="nc" id="L196">        int previousScore = controller.getLevelScore();</span>
+<span class="nc" id="L197">        controller.movePlayer(direction);</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        if (controller.isSolved()) {</span>
+<span class="nc" id="L199">            refresh(&quot;Level completed. Loading next level...&quot;);</span>
+<span class="nc" id="L200">            scheduleNextLevel();</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        } else if (controller.getLevelScore() &gt; previousScore) {</span>
+<span class="nc" id="L202">            refresh(&quot;Moved&quot;);</span>
+        } else {
+<span class="nc" id="L204">            refresh(&quot;Blocked&quot;);</span>
+        }
+<span class="nc" id="L206">    }</span>
+
+    private void undoMove() {
+<span class="nc bnc" id="L209" title="All 4 branches missed.">        if (gameCompleted || advancingLevel) {</span>
+<span class="nc" id="L210">            return;</span>
+        }
+
+<span class="nc" id="L213">        int previousScore = controller.getLevelScore();</span>
+<span class="nc" id="L214">        controller.undoMove();</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        if (controller.getLevelScore() &lt; previousScore) {</span>
+<span class="nc" id="L216">            refresh(&quot;Move undone&quot;);</span>
+        } else {
+<span class="nc" id="L218">            refresh(&quot;Nothing to undo&quot;);</span>
+        }
+<span class="nc" id="L220">    }</span>
+
+    private void newGame() {
+<span class="nc" id="L223">        cancelPendingLevelAdvance();</span>
+<span class="nc" id="L224">        controller.startNewGame();</span>
+<span class="nc" id="L225">        gameCompleted = false;</span>
+<span class="nc" id="L226">        advancingLevel = false;</span>
+<span class="nc" id="L227">        LOGGER.info(&quot;New game requested from UI&quot;);</span>
+<span class="nc" id="L228">        refresh(&quot;New game started&quot;);</span>
+<span class="nc" id="L229">    }</span>
+
+    private void restartLevel() {
+<span class="nc" id="L232">        cancelPendingLevelAdvance();</span>
+<span class="nc" id="L233">        controller.restartLevel();</span>
+<span class="nc" id="L234">        gameCompleted = false;</span>
+<span class="nc" id="L235">        advancingLevel = false;</span>
+<span class="nc" id="L236">        LOGGER.info(&quot;Restart requested from UI for level {}&quot;, controller.getLevelNumber());</span>
+<span class="nc" id="L237">        refresh(&quot;Level restarted&quot;);</span>
+<span class="nc" id="L238">    }</span>
+
+    private void saveGame() {
+<span class="nc" id="L241">        JFileChooser fileChooser = createSaveFileChooser();</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        if (fileChooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {</span>
+<span class="nc" id="L243">            return;</span>
+        }
+
+<span class="nc" id="L246">        File selectedFile = ensureSaveExtension(fileChooser.getSelectedFile());</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        if (selectedFile == null) {</span>
+<span class="nc" id="L248">            showError(&quot;Could not save the game&quot;, new IllegalArgumentException(&quot;No save file was selected&quot;));</span>
+<span class="nc" id="L249">            return;</span>
+        }
+        try {
+<span class="nc" id="L252">            controller.saveGame(selectedFile.toPath());</span>
+<span class="nc" id="L253">            LOGGER.info(&quot;Save requested from UI: {}&quot;, selectedFile);</span>
+<span class="nc" id="L254">            refresh(&quot;Game saved&quot;);</span>
+<span class="nc" id="L255">        } catch (IOException | RuntimeException exception) {</span>
+<span class="nc" id="L256">            showError(&quot;Could not save the game&quot;, exception);</span>
+<span class="nc" id="L257">        }</span>
+<span class="nc" id="L258">    }</span>
+
+    private void openSavedGame() {
+<span class="nc" id="L261">        JFileChooser fileChooser = createSaveFileChooser();</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        if (fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {</span>
+<span class="nc" id="L263">            return;</span>
+        }
+
+<span class="nc" id="L266">        cancelPendingLevelAdvance();</span>
+        try {
+<span class="nc" id="L268">            controller.loadGame(fileChooser.getSelectedFile().toPath());</span>
+<span class="nc" id="L269">            gameCompleted = false;</span>
+<span class="nc" id="L270">            advancingLevel = false;</span>
+<span class="nc" id="L271">            LOGGER.info(&quot;Load requested from UI&quot;);</span>
+<span class="nc" id="L272">            refresh(&quot;Game loaded&quot;);</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">            if (controller.isSolved()) {</span>
+<span class="nc" id="L274">                scheduleNextLevel();</span>
+            }
+<span class="nc" id="L276">        } catch (IOException | RuntimeException exception) {</span>
+<span class="nc" id="L277">            showError(&quot;Could not open the saved game&quot;, exception);</span>
+<span class="nc" id="L278">        }</span>
+<span class="nc" id="L279">    }</span>
+
+    private JFileChooser createSaveFileChooser() {
+<span class="nc" id="L282">        JFileChooser fileChooser = new JFileChooser();</span>
+<span class="nc" id="L283">        fileChooser.setFileFilter(new FileNameExtensionFilter(&quot;Sokoban saved games (*.sok)&quot;, &quot;sok&quot;));</span>
+<span class="nc" id="L284">        return fileChooser;</span>
+    }
+
+    private File ensureSaveExtension(File file) {
+<span class="nc bnc" id="L288" title="All 4 branches missed.">        if (file == null || file.getName().toLowerCase().endsWith(SAVE_EXTENSION)) {</span>
+<span class="nc" id="L289">            return file;</span>
+        }
+<span class="nc" id="L291">        return new File(file.getParentFile(), file.getName() + SAVE_EXTENSION);</span>
+    }
+
+    private void showError(String message, Exception exception) {
+<span class="nc" id="L295">        LOGGER.error(message, exception);</span>
+<span class="nc" id="L296">        JOptionPane.showMessageDialog(</span>
+            this,
+<span class="nc" id="L298">            message + &quot;:\n&quot; + exception.getMessage(),</span>
+            &quot;Sokoban&quot;,
+            JOptionPane.ERROR_MESSAGE
+        );
+<span class="nc" id="L302">    }</span>
+
+    private void closeApplication() {
+<span class="nc" id="L305">        LOGGER.info(&quot;Closing application&quot;);</span>
+<span class="nc" id="L306">        cancelPendingLevelAdvance();</span>
+<span class="nc" id="L307">        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));</span>
+<span class="nc" id="L308">    }</span>
+
+    private void scheduleNextLevel() {
+<span class="nc" id="L311">        cancelPendingLevelAdvance();</span>
+<span class="nc" id="L312">        advancingLevel = true;</span>
+<span class="nc" id="L313">        LOGGER.info(&quot;Scheduling next level transition&quot;);</span>
+<span class="nc" id="L314">        levelAdvanceTimer = new Timer(700, event -&gt; advanceLevel());</span>
+<span class="nc" id="L315">        levelAdvanceTimer.setRepeats(false);</span>
+<span class="nc" id="L316">        levelAdvanceTimer.start();</span>
+<span class="nc" id="L317">    }</span>
+
+    private void advanceLevel() {
+<span class="nc" id="L320">        advancingLevel = false;</span>
+<span class="nc" id="L321">        levelAdvanceTimer = null;</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">        if (controller.nextLevel()) {</span>
+<span class="nc" id="L323">            LOGGER.info(&quot;Next level shown in UI: {}&quot;, controller.getLevelNumber());</span>
+<span class="nc" id="L324">            refresh(&quot;Next level loaded&quot;);</span>
+        } else {
+<span class="nc" id="L326">            gameCompleted = true;</span>
+<span class="nc" id="L327">            LOGGER.info(&quot;Game completed in UI with total score {}&quot;, controller.getGlobalScore());</span>
+<span class="nc" id="L328">            refresh(&quot;You won! Total score: &quot; + controller.getGlobalScore());</span>
+<span class="nc" id="L329">            showGameCompletedDialog();</span>
+        }
+<span class="nc" id="L331">    }</span>
+
+    private void showGameCompletedDialog() {
+<span class="nc" id="L334">        int option = JOptionPane.showOptionDialog(</span>
+            this,
+<span class="nc" id="L336">            &quot;You won!\nTotal score: &quot; + controller.getGlobalScore(),</span>
+            &quot;Game completed&quot;,
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.INFORMATION_MESSAGE,
+            null,
+            new Object[] { &quot;Play Again&quot;, &quot;Exit&quot; },
+            &quot;Play Again&quot;
+        );
+
+<span class="nc bnc" id="L345" title="All 2 branches missed.">        if (option == JOptionPane.YES_OPTION) {</span>
+<span class="nc" id="L346">            newGame();</span>
+        } else {
+<span class="nc" id="L348">            closeApplication();</span>
+        }
+<span class="nc" id="L350">    }</span>
+
+    private void cancelPendingLevelAdvance() {
+<span class="nc bnc" id="L353" title="All 2 branches missed.">        if (levelAdvanceTimer != null) {</span>
+<span class="nc" id="L354">            levelAdvanceTimer.stop();</span>
+<span class="nc" id="L355">            levelAdvanceTimer = null;</span>
+        }
+<span class="nc" id="L357">    }</span>
+
+    private void refresh(String status) {
+<span class="nc" id="L360">        levelLabel.setText(&quot;Level &quot; + controller.getLevelNumber() + &quot;: &quot; + controller.getLevelName());</span>
+<span class="nc" id="L361">        levelScoreLabel.setText(&quot;Level score: &quot; + controller.getLevelScore());</span>
+<span class="nc" id="L362">        globalScoreLabel.setText(&quot;Game score: &quot; + controller.getGlobalScore());</span>
+<span class="nc" id="L363">        statusLabel.setText(status);</span>
+<span class="nc" id="L364">        boardPanel.revalidate();</span>
+<span class="nc" id="L365">        boardPanel.repaint();</span>
+<span class="nc" id="L366">    }</span>
+
+    private static final class BoardPanel extends JPanel {
+        private static final long serialVersionUID = 1L;
+
+        private static final int TILE_SIZE = 52;
+        private static final int MIN_TILE_SIZE = 24;
+<span class="nc" id="L373">        private static final Color BACKGROUND = new Color(37, 42, 49);</span>
+<span class="nc" id="L374">        private static final Color FLOOR = new Color(234, 229, 217);</span>
+<span class="nc" id="L375">        private static final Color FLOOR_ALT = new Color(225, 220, 209);</span>
+<span class="nc" id="L376">        private static final Color GRID = new Color(204, 199, 190);</span>
+<span class="nc" id="L377">        private static final Color WALL_TILE = new Color(80, 88, 100);</span>
+<span class="nc" id="L378">        private static final Color WALL_DARK = new Color(55, 62, 72);</span>
+<span class="nc" id="L379">        private static final Color GOAL_MARK = new Color(54, 146, 109);</span>
+<span class="nc" id="L380">        private static final Color BOX_TILE = new Color(196, 128, 48);</span>
+<span class="nc" id="L381">        private static final Color BOX_ON_GOAL = new Color(53, 132, 94);</span>
+<span class="nc" id="L382">        private static final Color BOX_BORDER = new Color(116, 72, 29);</span>
+<span class="nc" id="L383">        private static final Color PLAYER_SKIN = new Color(236, 190, 143);</span>
+<span class="nc" id="L384">        private static final Color PLAYER_SHIRT = new Color(43, 114, 190);</span>
+<span class="nc" id="L385">        private static final Color PLAYER_PANTS = new Color(47, 64, 88);</span>
+<span class="nc" id="L386">        private static final Color PLAYER_OUTLINE = new Color(25, 72, 125);</span>
+
+        private final GameController controller;
+
+<span class="nc" id="L390">        private BoardPanel(GameController controller) {</span>
+<span class="nc" id="L391">            this.controller = controller;</span>
+<span class="nc" id="L392">            setBackground(BACKGROUND);</span>
+<span class="nc" id="L393">            setBorder(new EmptyBorder(16, 16, 16, 16));</span>
+<span class="nc" id="L394">        }</span>
+
+        @Override
+        public Dimension getPreferredSize() {
+<span class="nc" id="L398">            int width = controller.getBoardColumns() * TILE_SIZE + 32;</span>
+<span class="nc" id="L399">            int height = controller.getBoardRows() * TILE_SIZE + 32;</span>
+<span class="nc" id="L400">            return new Dimension(Math.max(420, width), Math.max(360, height));</span>
+        }
+
+        @Override
+        protected void paintComponent(Graphics graphics) {
+<span class="nc" id="L405">            super.paintComponent(graphics);</span>
+
+<span class="nc" id="L407">            Graphics2D g2 = (Graphics2D) graphics.create();</span>
+            try {
+<span class="nc" id="L409">                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);</span>
+<span class="nc" id="L410">                drawBoard(g2);</span>
+            } finally {
+<span class="nc" id="L412">                g2.dispose();</span>
+            }
+<span class="nc" id="L414">        }</span>
+
+        private void drawBoard(Graphics2D g2) {
+<span class="nc" id="L417">            int rows = controller.getBoardRows();</span>
+<span class="nc" id="L418">            int columns = controller.getBoardColumns();</span>
+<span class="nc bnc" id="L419" title="All 4 branches missed.">            if (rows == 0 || columns == 0) {</span>
+<span class="nc" id="L420">                return;</span>
+            }
+
+<span class="nc" id="L423">            int tile = Math.max(MIN_TILE_SIZE, Math.min(</span>
+<span class="nc" id="L424">                (getWidth() - 32) / columns,</span>
+<span class="nc" id="L425">                (getHeight() - 32) / rows</span>
+            ));
+<span class="nc" id="L427">            tile = Math.min(TILE_SIZE, tile);</span>
+
+<span class="nc" id="L429">            int boardWidth = tile * columns;</span>
+<span class="nc" id="L430">            int boardHeight = tile * rows;</span>
+<span class="nc" id="L431">            int originX = (getWidth() - boardWidth) / 2;</span>
+<span class="nc" id="L432">            int originY = (getHeight() - boardHeight) / 2;</span>
+
+<span class="nc bnc" id="L434" title="All 2 branches missed.">            for (int row = 0; row &lt; rows; row++) {</span>
+<span class="nc bnc" id="L435" title="All 2 branches missed.">                for (int column = 0; column &lt; columns; column++) {</span>
+<span class="nc" id="L436">                    int x = originX + column * tile;</span>
+<span class="nc" id="L437">                    int y = originY + row * tile;</span>
+<span class="nc" id="L438">                    drawTile(g2, x, y, tile, row, column);</span>
+                }
+            }
+<span class="nc" id="L441">        }</span>
+
+        private void drawTile(Graphics2D g2, int x, int y, int tile, int row, int column) {
+<span class="nc" id="L444">            IObject terrain = controller.getTerrainAt(column, row);</span>
+<span class="nc" id="L445">            IObject actor = controller.getActorAt(column, row);</span>
+
+<span class="nc" id="L447">            drawFloor(g2, x, y, tile, row, column);</span>
+<span class="nc bnc" id="L448" title="All 4 branches missed.">            if (terrain != null &amp;&amp; terrain.type() == WALL) {</span>
+<span class="nc" id="L449">                drawWall(g2, x, y, tile);</span>
+<span class="nc bnc" id="L450" title="All 4 branches missed.">            } else if (terrain != null &amp;&amp; terrain.type() == GOALPOSITION) {</span>
+<span class="nc" id="L451">                drawGoal(g2, x, y, tile);</span>
+            }
+
+<span class="nc bnc" id="L454" title="All 4 branches missed.">            if (actor != null &amp;&amp; actor.type() == BOX) {</span>
+<span class="nc" id="L455">                drawBox(g2, x, y, tile, actor.onGoalPos());</span>
+<span class="nc bnc" id="L456" title="All 4 branches missed.">            } else if (actor != null &amp;&amp; actor.type() == PLAYER) {</span>
+<span class="nc" id="L457">                drawPlayer(g2, x, y, tile);</span>
+            }
+<span class="nc" id="L459">        }</span>
+
+        private void drawFloor(Graphics2D g2, int x, int y, int tile, int row, int column) {
+<span class="nc bnc" id="L462" title="All 2 branches missed.">            g2.setColor((row + column) % 2 == 0 ? FLOOR : FLOOR_ALT);</span>
+<span class="nc" id="L463">            g2.fillRect(x, y, tile, tile);</span>
+<span class="nc" id="L464">            g2.setColor(GRID);</span>
+<span class="nc" id="L465">            g2.drawRect(x, y, tile, tile);</span>
+<span class="nc" id="L466">        }</span>
+
+        private void drawWall(Graphics2D g2, int x, int y, int tile) {
+<span class="nc" id="L469">            int inset = Math.max(2, tile / 18);</span>
+<span class="nc" id="L470">            g2.setColor(WALL_TILE);</span>
+<span class="nc" id="L471">            g2.fillRect(x + inset, y + inset, tile - inset * 2, tile - inset * 2);</span>
+<span class="nc" id="L472">            g2.setColor(WALL_DARK);</span>
+<span class="nc" id="L473">            g2.drawRect(x + inset, y + inset, tile - inset * 2, tile - inset * 2);</span>
+<span class="nc" id="L474">            g2.drawLine(x + inset, y + tile - inset * 2, x + tile - inset * 2, y + inset);</span>
+<span class="nc" id="L475">        }</span>
+
+        private void drawGoal(Graphics2D g2, int x, int y, int tile) {
+<span class="nc" id="L478">            int size = Math.max(10, tile / 3);</span>
+<span class="nc" id="L479">            int centerX = x + tile / 2;</span>
+<span class="nc" id="L480">            int centerY = y + tile / 2;</span>
+<span class="nc" id="L481">            int[] pointsX = { centerX, centerX + size / 2, centerX, centerX - size / 2 };</span>
+<span class="nc" id="L482">            int[] pointsY = { centerY - size / 2, centerY, centerY + size / 2, centerY };</span>
+<span class="nc" id="L483">            g2.setColor(GOAL_MARK);</span>
+<span class="nc" id="L484">            g2.fillPolygon(pointsX, pointsY, pointsX.length);</span>
+<span class="nc" id="L485">        }</span>
+
+        private void drawBox(Graphics2D g2, int x, int y, int tile, boolean onGoal) {
+<span class="nc" id="L488">            int pad = Math.max(5, tile / 8);</span>
+<span class="nc" id="L489">            int size = tile - pad * 2;</span>
+<span class="nc" id="L490">            int arc = Math.max(4, tile / 8);</span>
+<span class="nc bnc" id="L491" title="All 2 branches missed.">            g2.setColor(onGoal ? BOX_ON_GOAL : BOX_TILE);</span>
+<span class="nc" id="L492">            g2.fillRoundRect(x + pad, y + pad, size, size, arc, arc);</span>
+<span class="nc" id="L493">            g2.setColor(BOX_BORDER);</span>
+<span class="nc" id="L494">            g2.drawRoundRect(x + pad, y + pad, size, size, arc, arc);</span>
+<span class="nc" id="L495">            g2.drawLine(x + pad + 5, y + pad + 5, x + pad + size - 5, y + pad + size - 5);</span>
+<span class="nc" id="L496">            g2.drawLine(x + pad + size - 5, y + pad + 5, x + pad + 5, y + pad + size - 5);</span>
+<span class="nc" id="L497">        }</span>
+
+        private void drawPlayer(Graphics2D g2, int x, int y, int tile) {
+<span class="nc" id="L500">            int centerX = x + tile / 2;</span>
+<span class="nc" id="L501">            int head = Math.max(8, tile / 5);</span>
+<span class="nc" id="L502">            int headX = centerX - head / 2;</span>
+<span class="nc" id="L503">            int headY = y + Math.max(5, tile / 8);</span>
+<span class="nc" id="L504">            g2.setColor(PLAYER_SKIN);</span>
+<span class="nc" id="L505">            g2.fillOval(headX, headY, head, head);</span>
+<span class="nc" id="L506">            g2.setColor(PLAYER_OUTLINE);</span>
+<span class="nc" id="L507">            g2.drawOval(headX, headY, head, head);</span>
+
+<span class="nc" id="L509">            int bodyWidth = Math.max(12, tile / 4);</span>
+<span class="nc" id="L510">            int bodyHeight = Math.max(14, tile / 3);</span>
+<span class="nc" id="L511">            int bodyX = centerX - bodyWidth / 2;</span>
+<span class="nc" id="L512">            int bodyY = headY + head - 1;</span>
+<span class="nc" id="L513">            int arc = Math.max(4, tile / 10);</span>
+<span class="nc" id="L514">            g2.setColor(PLAYER_SHIRT);</span>
+<span class="nc" id="L515">            g2.fillRoundRect(bodyX, bodyY, bodyWidth, bodyHeight, arc, arc);</span>
+<span class="nc" id="L516">            g2.setColor(PLAYER_OUTLINE);</span>
+<span class="nc" id="L517">            g2.drawRoundRect(bodyX, bodyY, bodyWidth, bodyHeight, arc, arc);</span>
+
+<span class="nc" id="L519">            int armWidth = Math.max(4, tile / 12);</span>
+<span class="nc" id="L520">            int armHeight = Math.max(11, tile / 4);</span>
+<span class="nc" id="L521">            int armY = bodyY + Math.max(2, tile / 18);</span>
+<span class="nc" id="L522">            g2.setColor(PLAYER_SHIRT);</span>
+<span class="nc" id="L523">            g2.fillRoundRect(bodyX - armWidth + 1, armY, armWidth, armHeight, armWidth, armWidth);</span>
+<span class="nc" id="L524">            g2.fillRoundRect(bodyX + bodyWidth - 1, armY, armWidth, armHeight, armWidth, armWidth);</span>
+
+<span class="nc" id="L526">            int legWidth = Math.max(4, tile / 12);</span>
+<span class="nc" id="L527">            int legHeight = Math.max(9, tile / 5);</span>
+<span class="nc" id="L528">            int legY = bodyY + bodyHeight - 1;</span>
+<span class="nc" id="L529">            g2.setColor(PLAYER_PANTS);</span>
+<span class="nc" id="L530">            g2.fillRoundRect(centerX - legWidth - 1, legY, legWidth, legHeight, legWidth, legWidth);</span>
+<span class="nc" id="L531">            g2.fillRoundRect(centerX + 1, legY, legWidth, legHeight, legWidth, legWidth);</span>
+<span class="nc" id="L532">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

@@ -16,6 +16,12 @@ Compile and run the tests:
 mvn test
 ```
 
+Run the full verification pipeline used by SonarQube:
+
+```sh
+mvn clean verify
+```
+
 Run the graphical version:
 
 ```sh
@@ -40,6 +46,37 @@ To run the JAR in console mode:
 ```sh
 java -jar target/sokoban-1.0-SNAPSHOT.jar --console
 ```
+
+## SonarQube
+
+The Maven build is configured for the course SonarQube server:
+
+```text
+https://costa.ls.fi.upm.es/sonar
+```
+
+Coverage is imported from JaCoCo and only the model code is counted for the
+coverage metric. The following classes are excluded from Sonar coverage:
+
+- `App.java`
+- `controller/**`
+- `view/**`
+
+To publish an analysis, run:
+
+```sh
+mvn clean verify sonar:sonar -Dsonar.id=<your-team-id>
+```
+
+If the server requires authentication, add your token:
+
+```sh
+mvn clean verify sonar:sonar -Dsonar.id=<your-team-id> -Dsonar.token=<your-token>
+```
+
+`sonar.id` is used to make the project key unique on the shared server. Replace
+`<your-team-id>` with your group or repository identifier before the final
+submission.
 
 ## Files Read and Written by the Application
 
@@ -172,8 +209,8 @@ Enter one command per line:
 ## Scoring and Game Rules
 
 The level score is the number of successful moves made in the current level.
-Blocked moves do not increase the score. Undo decreases the current level score
-by one, down to zero.
+Blocked moves do not increase the score. Undo restores the board state, but it
+does not reduce the recorded level score.
 
 The global score is the sum of completed level scores. A level is solved when
 all boxes are on goal positions. When the graphical version solves a level, it

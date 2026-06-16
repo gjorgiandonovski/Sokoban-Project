@@ -134,25 +134,32 @@
   <properties>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.clean>3.1.0</maven.clean>
-    <junit>5.6.2</junit>
-    <sonar.language>java</sonar.language>
     <sonar.projectName>${project.name}-${sonar.id}</sonar.projectName>
     <mainClass>es.upm.pproject.sokoban.App</mainClass>
+    <sonar.host.url>https://costa.ls.fi.upm.es/sonar</sonar.host.url>
+    <maven.shade>3.2.2</maven.shade>
+    <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
+    <sonar.tests>src/test/java</sonar.tests>
+    <slf4j.version>1.7.36</slf4j.version>
+    <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <sonar.java.binaries>${project.build.directory}/classes</sonar.java.binaries>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.id>local</sonar.id>
+    <sonar.coverage.exclusions>**/App.java,**/view/**,**/controller/**</sonar.coverage.exclusions>
+    <sonar.language>java</sonar.language>
+    <junit>5.6.2</junit>
     <java.version>11</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
-    <sonar.host.url>https://costa.ls.fi.upm.es/sonar</sonar.host.url>
     <maven.jar>3.2.0</maven.jar>
+    <sonar.sources>src/main/java</sonar.sources>
     <jacoco.version>0.8.6</jacoco.version>
     <maven.compiler>3.8.1</maven.compiler>
-    <maven.shade>3.2.2</maven.shade>
     <sonar.scm.provider>git</sonar.scm.provider>
     <maven.install>3.0.0-M1</maven.install>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <sonar.projectKey>${project.groupId}:${project.artifactId}:${sonar.projectName}:${sonar.id}</sonar.projectKey>
-    <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
+    <sonar.projectKey>${project.groupId}:${project.artifactId}:${sonar.id}</sonar.projectKey>
     <maven.resources>3.1.0</maven.resources>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.surefire>3.0.0-M5</maven.surefire>
-    <sonar.coverage.exclusions>**/view/**,**/controller/**</sonar.coverage.exclusions>
   </properties>
 </project>

@@ -1,0 +1,11 @@
+es.upm.pproject.sokoban.controller.GameController:43,src/main/java/es/upm/pproject/sokoban/controller/GameController.java:43
+es.upm.pproject.sokoban.controller.GameController$SaveGameState:284,src/main/java/es/upm/pproject/sokoban/controller/GameController.java:284
+es.upm.pproject.sokoban.controller.GameController$SaveGameState:287,src/main/java/es/upm/pproject/sokoban/controller/GameController.java:287
+es.upm.pproject.sokoban.controller.GameController$SaveGameState:286,src/main/java/es/upm/pproject/sokoban/controller/GameController.java:286
+es.upm.pproject.sokoban.controller.GameController$SaveGameState:283,src/main/java/es/upm/pproject/sokoban/controller/GameController.java:283
+es.upm.pproject.sokoban.controller.GameController$SaveGameState:285,src/main/java/es/upm/pproject/sokoban/controller/GameController.java:285
+es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl:69,src/main/java/es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java:69
+es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts:-1,src/main/java/es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java:-1
+es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts:-1,src/main/java/es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java:-1
+es.upm.pproject.sokoban.model.services.implementations.LevelParserServiceImpl$LevelCounts:-1,src/main/java/es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java:-1
+es.upm.pproject.sokoban.view.SwingGameFrame:302,src/main/java/es/upm/pproject/sokoban/view/SwingGameFrame.java:302

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="10.9.3">
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/dto/Type.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/services/interfaces/BoardService.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/dto/Player.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/view/GameView.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/controller/GameController.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/dto/Wall.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/services/interfaces/LevelParserService.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/dto/Board.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/services/implementations/LevelParserServiceImpl.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/services/interfaces/PairService.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/dto/IObject.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/dto/Box.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/services/implementations/ServiceFactory.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/services/implementations/BoardServiceImpl.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/services/implementations/PairServiceImpl.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/dto/Pair.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/App.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/view/SwingGameFrame.java">
+</file>
+<file name="/Users/gjorgiandonovski/IdeaProjects/untitled34/sokoban-proyect/src/main/java/es/upm/pproject/sokoban/model/dto/GoalPosition.java">
+</file>
+</checkstyle>
