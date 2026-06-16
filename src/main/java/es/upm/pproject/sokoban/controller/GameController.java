@@ -21,6 +21,7 @@ import es.upm.pproject.sokoban.model.services.interfaces.LevelParserService;
 public class GameController {
     private static final int INITIAL_LEVEL = 1;
     private static final int INITIAL_SCORE = 0;
+    private static final String LEVEL_FILE_NOT_FOUND_PREFIX = "Level file not found:";
     private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
 
     private final BoardService boardService;
@@ -33,14 +34,31 @@ public class GameController {
     private boolean currentLevelScoreRecorded;
 
     public GameController() {
-        this.boardService = ServiceFactory.createBoardService();
-        this.pairService = ServiceFactory.createPairService();
-        this.levelParserService = ServiceFactory.createLevelParserService();
+        this(
+            ServiceFactory.createBoardService(),
+            ServiceFactory.createPairService(),
+            ServiceFactory.createLevelParserService()
+        );
+    }
+
+    public GameController(
+        BoardService boardService,
+        PairService pairService,
+        LevelParserService levelParserService
+    ) {
+        this.boardService = boardService;
+        this.pairService = pairService;
+        this.levelParserService = levelParserService;
         this.levelNumber = INITIAL_LEVEL;
         this.levelScore = INITIAL_SCORE;
         this.globalScore = INITIAL_SCORE;
         this.currentLevelScoreRecorded = false;
-        this.board = loadLevelInternal(levelNumber);
+        LevelLoadResult initialLevel = findNextValidLevel(INITIAL_LEVEL);
+        if (initialLevel == null) {
+            throw new IllegalStateException("No valid levels available starting from level " + INITIAL_LEVEL);
+        }
+        this.levelNumber = initialLevel.getLevelNumber();
+        this.board = initialLevel.getBoard();
         LOGGER.info("Game controller initialized at level {}", levelNumber);
     }
 
@@ -60,7 +78,6 @@ public class GameController {
     public void undoMove() {
         if (boardService.undo(board)) {
             clearCurrentLevelScoreRecord();
-            levelScore = Math.max(INITIAL_SCORE, levelScore - 1);
             LOGGER.info("Undo applied on level {}; score={}", levelNumber, levelScore);
         } else {
             LOGGER.debug("Undo ignored because move history is empty on level {}", levelNumber);
@@ -69,35 +86,42 @@ public class GameController {
 
     public void restartLevel() {
         clearCurrentLevelScoreRecord();
-        this.board = loadLevelInternal(levelNumber);
+        LevelLoadResult restartedLevel = findNextValidLevel(levelNumber);
+        if (restartedLevel == null) {
+            throw new IllegalStateException("Could not reload a valid level starting from level " + levelNumber);
+        }
+        this.levelNumber = restartedLevel.getLevelNumber();
+        this.board = restartedLevel.getBoard();
         this.levelScore = INITIAL_SCORE;
         LOGGER.info("Level {} restarted", levelNumber);
     }
 
     public void startNewGame() {
-        this.levelNumber = INITIAL_LEVEL;
+        LevelLoadResult firstLevel = findNextValidLevel(INITIAL_LEVEL);
+        if (firstLevel == null) {
+            throw new IllegalStateException("No valid levels available starting from level " + INITIAL_LEVEL);
+        }
+        this.levelNumber = firstLevel.getLevelNumber();
         this.levelScore = INITIAL_SCORE;
         this.globalScore = INITIAL_SCORE;
         this.currentLevelScoreRecorded = false;
-        this.board = loadLevelInternal(levelNumber);
+        this.board = firstLevel.getBoard();
         LOGGER.info("New game started");
     }
 
     public boolean nextLevel() {
         recordCurrentLevelScoreIfSolved();
-        int nextLevelNumber = levelNumber + 1;
-        try {
-            Board nextBoard = loadLevelInternal(nextLevelNumber);
-            this.levelNumber = nextLevelNumber;
-            this.board = nextBoard;
-            this.levelScore = INITIAL_SCORE;
-            this.currentLevelScoreRecorded = false;
-            LOGGER.info("Advanced to level {}", levelNumber);
-            return true;
-        } catch (Exception e) {
+        LevelLoadResult nextLevel = findNextValidLevel(levelNumber + 1);
+        if (nextLevel == null) {
             LOGGER.info("No next level available after level {}", levelNumber);
             return false;
         }
+        this.levelNumber = nextLevel.getLevelNumber();
+        this.board = nextLevel.getBoard();
+        this.levelScore = INITIAL_SCORE;
+        this.currentLevelScoreRecorded = false;
+        LOGGER.info("Advanced to level {}", levelNumber);
+        return true;
     }
 
     public Board getBoard() {
@@ -178,6 +202,30 @@ public class GameController {
         Board loadedBoard = levelParserService.parseResource(fileName, boardService);
         LOGGER.info("Loaded level {} ({})", level, loadedBoard.getLevelName());
         return loadedBoard;
+    }
+
+    private LevelLoadResult findNextValidLevel(int startingLevel) {
+        int candidateLevel = startingLevel;
+        while (true) {
+            try {
+                return new LevelLoadResult(candidateLevel, loadLevelInternal(candidateLevel));
+            } catch (IllegalArgumentException exception) {
+                if (isMissingLevelFile(exception)) {
+                    return null;
+                }
+                LOGGER.error(
+                    "Skipping invalid level {} because it could not be loaded: {}",
+                    candidateLevel,
+                    exception.getMessage()
+                );
+                candidateLevel++;
+            }
+        }
+    }
+
+    private boolean isMissingLevelFile(IllegalArgumentException exception) {
+        return exception.getMessage() != null
+            && exception.getMessage().startsWith(LEVEL_FILE_NOT_FOUND_PREFIX);
     }
 
     public Pair directionFromInput(char character) {
@@ -311,6 +359,24 @@ public class GameController {
 
         private boolean isCurrentLevelScoreRecorded() {
             return currentLevelScoreRecorded;
+        }
+    }
+
+    private static final class LevelLoadResult {
+        private final int levelNumber;
+        private final Board board;
+
+        private LevelLoadResult(int levelNumber, Board board) {
+            this.levelNumber = levelNumber;
+            this.board = board;
+        }
+
+        private int getLevelNumber() {
+            return levelNumber;
+        }
+
+        private Board getBoard() {
+            return board;
         }
     }
 }

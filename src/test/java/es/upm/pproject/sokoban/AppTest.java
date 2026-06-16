@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
@@ -24,6 +25,8 @@ import es.upm.pproject.sokoban.model.dto.Type;
 import es.upm.pproject.sokoban.model.dto.Wall;
 import es.upm.pproject.sokoban.model.services.implementations.ServiceFactory;
 import es.upm.pproject.sokoban.model.services.interfaces.BoardService;
+import es.upm.pproject.sokoban.model.services.interfaces.LevelParserService;
+import es.upm.pproject.sokoban.model.services.interfaces.PairService;
 import es.upm.pproject.sokoban.view.GameView;
 
 public class AppTest {
@@ -93,8 +96,18 @@ public class AppTest {
 
         loadedController.undoMove();
 
-        assertEquals(0, loadedController.getLevelScore());
+        assertEquals(1, loadedController.getLevelScore());
         assertEquals(initialRender, loadedController.getBoardService().render(loadedController.getBoard()));
+    }
+
+    @Test
+    public void undoDoesNotReduceLevelScore() {
+        GameController controller = new GameController();
+
+        controller.movePlayer(new Pair(1, 0));
+        controller.undoMove();
+
+        assertEquals(1, controller.getLevelScore());
     }
 
     @Test
@@ -152,6 +165,34 @@ public class AppTest {
 
         assertEquals(0, controller.getLevelScore());
         assertEquals(initialRender, controller.getBoardService().render(controller.getBoard()));
+    }
+
+    @Test
+    public void controllerStartsAtFirstValidLevelWhenEarlierLevelIsInvalid() {
+        PairService pairService = ServiceFactory.createPairService();
+        LevelParserService parser = parserWithSequence(
+                invalidLevel("level 1.txt", "level 1.txt must have exactly one warehouse man"),
+                validLevel("level 2.txt", board("Recovered level")));
+
+        GameController controller = new GameController(boardService, pairService, parser);
+
+        assertEquals(2, controller.getLevelNumber());
+        assertEquals("Recovered level", controller.getLevelName());
+    }
+
+    @Test
+    public void nextLevelSkipsInvalidLevelFiles() {
+        PairService pairService = ServiceFactory.createPairService();
+        LevelParserService parser = parserWithSequence(
+                validLevel("level 1.txt", board("Initial test level")),
+                invalidLevel("level 2.txt", "Invalid dimensions in level 2.txt"),
+                validLevel("level 3.txt", board("Recovered next level")));
+
+        GameController controller = new GameController(boardService, pairService, parser);
+
+        assertTrue(controller.nextLevel());
+        assertEquals(3, controller.getLevelNumber());
+        assertEquals("Recovered next level", controller.getLevelName());
     }
 
     @Test
@@ -517,6 +558,55 @@ public class AppTest {
     private void move(GameController controller, Pair... directions) {
         for (Pair direction : directions) {
             controller.movePlayer(direction);
+        }
+    }
+
+    private LevelParserService parserWithSequence(LevelSpec... specs) {
+        return new LevelParserService() {
+            @Override
+            public Board parseResource(String fileName, BoardService ignoredBoardService) {
+                for (LevelSpec spec : specs) {
+                    if (!spec.fileName.equals(fileName)) {
+                        continue;
+                    }
+                    if (spec.errorMessage != null) {
+                        throw new IllegalArgumentException(spec.errorMessage);
+                    }
+                    return spec.board;
+                }
+                throw new IllegalArgumentException("Level file not found: " + fileName);
+            }
+
+            @Override
+            public Board parse(InputStream stream, String sourceName, BoardService ignoredBoardService) {
+                throw new UnsupportedOperationException("parse(InputStream, ...) is not used in this test");
+            }
+        };
+    }
+
+    private LevelSpec validLevel(String fileName, Board board) {
+        return new LevelSpec(fileName, board, null);
+    }
+
+    private LevelSpec invalidLevel(String fileName, String errorMessage) {
+        return new LevelSpec(fileName, null, errorMessage);
+    }
+
+    private Board board(String levelName) {
+        Board board = new Board(levelName, 1, 1);
+        boardService.addActor(board, new Pair(0, 0), new Player());
+        return board;
+    }
+
+    private static final class LevelSpec {
+        private final String fileName;
+        private final Board board;
+        private final String errorMessage;
+
+        private LevelSpec(String fileName, Board board, String errorMessage) {
+            this.fileName = fileName;
+            this.board = board;
+            this.errorMessage = errorMessage;
         }
     }
 }
