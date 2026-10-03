@@ -1,7 +1,7 @@
 # Sokoban Proyect
 
 Java implementation of the Sokoban game. The application can be used with a
-Swing graphical interface or in console mode.
+Swing graphical interface or in console mode..
 
 ## Requirements
 
